@@ -1,0 +1,122 @@
+---
+import HeroScene from './react/HeroScene';
+import MagneticButton from './react/MagneticButton';
+import { ROLES } from '@/lib/site';
+---
+
+<section
+  id="hero"
+  class="relative isolate overflow-hidden min-h-[100svh] grain"
+>
+  <div class="absolute inset-0 bg-gradient-to-b from-cream via-paper to-cream-2"></div>
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute -top-[20vmin] -right-[20vmin] h-[80vmin] w-[80vmin] rounded-full bg-coral/35 blur-[140px]"
+  ></div>
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute -bottom-[10vmin] -left-[10vmin] h-[60vmin] w-[60vmin] rounded-full bg-blue/15 blur-[140px]"
+  ></div>
+
+  <HeroScene
+    client:only="react"
+    className="pointer-events-none absolute inset-0 z-[1] opacity-70 sm:opacity-100"
+  />
+
+  <div class="relative z-[2] max-w-7xl mx-auto px-5 sm:px-10 pt-32 sm:pt-44 pb-24 sm:pb-20">
+    <p class="font-mono text-xs tracking-[0.3em] text-ink-soft" data-reveal>
+      // PORTFOLIO · 2025
+    </p>
+
+    <h1
+      class="mt-6 font-display font-medium leading-[0.92] tracking-tight text-balance"
+      style="font-size: clamp(2.6rem, 11vw, 11rem);"
+      data-reveal
+    >
+      <span class="block">Storytelling</span>
+      <span class="block flex flex-wrap items-baseline gap-x-3 sm:gap-x-6 gap-y-1 sm:gap-y-2">
+        <span class="text-ink-soft/80 italic">through</span>
+        <span class="relative inline-block">
+          <span
+            id="dynamic-word"
+            class="inline-block text-coral"
+          >Pixels</span>
+          <span
+            aria-hidden="true"
+            class="absolute -bottom-1 sm:-bottom-2 left-0 right-0 h-2 sm:h-3 bg-blue/15 -z-10"
+          ></span>
+        </span>
+      </span>
+    </h1>
+
+    <div class="mt-8 sm:mt-12 max-w-3xl flex flex-col gap-6 sm:gap-7" data-reveal>
+      <p class="text-base sm:text-lg text-ink-soft text-pretty">
+        I’m <strong class="font-semibold text-ink">Mayyar Al-Sharqawi</strong> — a filmmaker, full-stack visual designer and AI specialist based in Jordan. I direct, design and engineer creative work that travels between cinema, brand and emerging tech.
+      </p>
+
+      <div class="flex flex-wrap gap-2">
+        {ROLES.map((role) => (
+          <span
+            class="font-mono text-[11px] uppercase tracking-[0.18em] text-ink-soft border border-ink/15 rounded-full px-3 py-1.5 bg-paper/70"
+          >
+            {role}
+          </span>
+        ))}
+      </div>
+    </div>
+
+    <div class="mt-8 sm:mt-12 flex flex-wrap items-center gap-5" data-reveal>
+      <MagneticButton
+        client:visible
+        href="#work"
+        className="group rounded-full bg-ink text-cream px-7 py-4 text-base font-medium hover:bg-coral transition-colors"
+      >
+        <span class="inline-flex items-center gap-3">
+          View the work
+          <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-cream text-ink group-hover:rotate-45 transition-transform">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="M13 5l7 7-7 7" />
+            </svg>
+          </span>
+        </span>
+      </MagneticButton>
+
+      <a
+        href="#about"
+        data-cursor-link
+        class="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-ink"
+      >
+        About me
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 5v14" />
+          <path d="M5 12l7 7 7-7" />
+        </svg>
+      </a>
+    </div>
+  </div>
+
+  <div class="absolute bottom-6 left-1/2 -translate-x-1/2 z-[2] flex flex-col items-center gap-2 text-ink-soft" aria-hidden="true">
+    <span class="font-mono text-[10px] tracking-[0.3em] uppercase">Scroll</span>
+    <span class="block h-10 w-px bg-ink/30"></span>
+  </div>
+</section>
+
+<script>
+  const words = ['Pixels', 'Cinema', 'Pictures', 'Story', 'Motion', 'Design', 'Code', 'AI'];
+  const el = document.getElementById('dynamic-word');
+  if (el) {
+    let i = 0;
+    setInterval(() => {
+      i = (i + 1) % words.length;
+      el.style.transition = 'opacity 220ms ease, transform 220ms ease';
+      el.style.opacity = '0';
+      el.style.transform = 'translateY(8px)';
+      setTimeout(() => {
+        el.textContent = words[i] ?? 'Pixels';
+        el.style.opacity = '1';
+        el.style.transform = 'translateY(0)';
+      }, 220);
+    }, 2400);
+  }
+</script>

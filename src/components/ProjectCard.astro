@@ -1,0 +1,188 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  project: CollectionEntry<'projects'>;
+  spanClass: string;
+  indexLabel?: string;
+}
+
+const { project, spanClass, indexLabel } = Astro.props;
+const { data } = project;
+const isVideo = data.media.type === 'youtube' || data.media.type === 'video';
+
+let lightboxSrc = '';
+let lightboxType: 'youtube' | 'image' | 'video' = 'image';
+if (data.media.type === 'youtube') {
+  lightboxSrc = data.media.src;
+  lightboxType = 'youtube';
+} else if (data.media.type === 'video') {
+  lightboxSrc = data.media.src;
+  lightboxType = 'video';
+} else if (data.media.type === 'image') {
+  lightboxSrc = data.media.src;
+  lightboxType = 'image';
+} else if (data.media.type === 'gallery') {
+  lightboxSrc = data.media.images[0]?.src ?? data.thumbnail;
+  lightboxType = 'image';
+}
+
+const lightboxPayload = JSON.stringify({
+  type: lightboxType,
+  src: lightboxSrc,
+  title: data.title,
+  category: data.category,
+  vertical: data.vertical ?? false,
+});
+
+const categoryLabel: Record<string, string> = {
+  film: 'Film',
+  editing: 'Editing',
+  motion: 'Motion',
+  content: 'Content',
+  design: 'Design',
+  ai: 'AI Lab',
+};
+---
+
+<article
+  data-card
+  data-category={data.category}
+  class:list={[
+    spanClass,
+    'group relative overflow-hidden rounded-[var(--radius-card)] bg-cream-2 cursor-none isolate',
+  ]}
+>
+  <button
+    type="button"
+    class="absolute inset-0 w-full h-full text-left"
+    data-cursor-play={isVideo ? '' : undefined}
+    data-cursor-link={!isVideo ? '' : undefined}
+    aria-label={`Open ${data.title}`}
+    data-lightbox={lightboxPayload}
+  >
+    <img
+      src={data.thumbnail}
+      alt={data.title}
+      crossorigin="anonymous"
+      class="thumb absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
+      loading="lazy"
+      decoding="async"
+    />
+    <span
+      aria-hidden="true"
+      class="thumb-fallback absolute inset-0 hidden bg-gradient-to-br from-coral via-coral/70 to-blue/80 mix-blend-normal"
+    ></span>
+
+    <div class="absolute inset-0 bg-gradient-to-t from-ink/85 via-ink/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+
+    <div class="absolute top-3 left-3 flex items-center gap-2">
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-paper/85 backdrop-blur text-ink font-mono text-[10px] tracking-[0.18em] uppercase">
+        <span class="w-1.5 h-1.5 rounded-full bg-coral"></span>
+        {categoryLabel[data.category] ?? data.category}
+      </span>
+      {data.featured && (
+        <span class="hidden sm:inline-flex px-2 py-1 rounded-full bg-coral text-cream font-mono text-[10px] tracking-[0.18em] uppercase">
+          Featured
+        </span>
+      )}
+    </div>
+
+    {indexLabel && (
+      <span class="absolute top-3 right-3 font-mono text-[10px] tracking-[0.2em] text-paper/80 mix-blend-difference">
+        {indexLabel}
+      </span>
+    )}
+
+    {isVideo && (
+      <div
+        aria-hidden="true"
+        class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+      >
+        <span class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-coral text-cream shadow-lg translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M8 5v14l11-7-11-7z" />
+          </svg>
+        </span>
+      </div>
+    )}
+
+    <div class="absolute bottom-3 left-3 right-3 flex items-end justify-between gap-3 translate-y-1 group-hover:translate-y-0 transition-transform duration-500">
+      <div>
+        <h3 class="font-display text-base sm:text-lg leading-tight text-cream drop-shadow group-hover:text-cream">
+          {data.title}
+        </h3>
+        {data.tagline && (
+          <p class="hidden sm:block mt-1 text-cream/75 text-xs sm:text-sm line-clamp-2">
+            {data.tagline}
+          </p>
+        )}
+      </div>
+      {data.year && (
+        <span class="font-mono text-[10px] tracking-[0.2em] text-cream/70 shrink-0">
+          {data.year}
+        </span>
+      )}
+    </div>
+  </button>
+</article>
+
+<script>
+  const cards = document.querySelectorAll<HTMLElement>('[data-lightbox]');
+  cards.forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      try {
+        const payload = JSON.parse(btn.getAttribute('data-lightbox') ?? '{}');
+        window.dispatchEvent(new CustomEvent('lightbox:open', { detail: payload }));
+      } catch {}
+    });
+  });
+
+  // YouTube returns a uniformly gray 480x360 placeholder when a video has no real thumb.
+  // Sample pixels on a small canvas and detect low-variance gray to swap in a gradient.
+  const swapBroken = (img: HTMLImageElement) => {
+    const fallback = img.parentElement?.querySelector<HTMLElement>('.thumb-fallback');
+    if (!fallback) return;
+    if (img.naturalWidth === 0) {
+      img.style.display = 'none';
+      fallback.classList.remove('hidden');
+      return;
+    }
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 8;
+      canvas.height = 8;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) return;
+      ctx.drawImage(img, 0, 0, 8, 8);
+      const { data } = ctx.getImageData(0, 0, 8, 8);
+      let rs = 0, gs = 0, bs = 0;
+      const n = data.length / 4;
+      for (let i = 0; i < data.length; i += 4) {
+        rs += data[i] as number;
+        gs += data[i + 1] as number;
+        bs += data[i + 2] as number;
+      }
+      const ar = rs / n, ag = gs / n, ab = bs / n;
+      let variance = 0;
+      for (let i = 0; i < data.length; i += 4) {
+        const r = data[i] as number;
+        const g = data[i + 1] as number;
+        const b = data[i + 2] as number;
+        variance += (r - ar) ** 2 + (g - ag) ** 2 + (b - ab) ** 2;
+      }
+      variance /= n * 3;
+      const isGray = Math.abs(ar - ag) < 6 && Math.abs(ag - ab) < 6 && variance < 60;
+      if (isGray) {
+        img.style.display = 'none';
+        fallback.classList.remove('hidden');
+      }
+    } catch {}
+  };
+  document.querySelectorAll<HTMLImageElement>('.thumb').forEach((img) => {
+    if (img.complete) swapBroken(img);
+    else img.addEventListener('load', () => swapBroken(img));
+    img.addEventListener('error', () => swapBroken(img));
+  });
+</script>

@@ -1,0 +1,26 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Hero from '@/components/Hero.astro';
+import Marquee from '@/components/Marquee.astro';
+import AboutStrip from '@/components/AboutStrip.astro';
+import Work from '@/components/Work.astro';
+import AILab from '@/components/AILab.astro';
+import Process from '@/components/Process.astro';
+import About from '@/components/About.astro';
+import Experience from '@/components/Experience.astro';
+import TwigTech from '@/components/TwigTech.astro';
+import Lightbox from '@/components/react/Lightbox';
+---
+
+<BaseLayout>
+  <Hero />
+  <Marquee />
+  <AboutStrip />
+  <Work />
+  <AILab />
+  <Process />
+  <About />
+  <Experience />
+  <TwigTech />
+  <Lightbox client:idle />
+</BaseLayout>

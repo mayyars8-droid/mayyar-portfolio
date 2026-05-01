@@ -1,0 +1,33 @@
+---
+const items = [
+  'Filmmaker',
+  '★',
+  'Visual Designer',
+  '★',
+  'Motion Designer',
+  '★',
+  'AI Specialist',
+  '★',
+  'Full-Stack Designer',
+  '★',
+  'Storyteller',
+  '★',
+];
+---
+
+<section
+  aria-hidden="true"
+  class="relative py-12 sm:py-16 border-y border-ink/10 bg-paper overflow-hidden"
+>
+  <div class="ticker-mask">
+    <div class="marquee-track flex w-max items-center gap-8 sm:gap-12 px-6">
+      {[...items, ...items].map((item) => (
+        <span
+          class="font-display text-[clamp(2.6rem,8vw,7rem)] leading-none tracking-tight whitespace-nowrap text-ink-soft hover:text-coral transition-colors"
+        >
+          {item === '★' ? <span class="text-coral inline-block align-middle">●</span> : item}
+        </span>
+      ))}
+    </div>
+  </div>
+</section>
