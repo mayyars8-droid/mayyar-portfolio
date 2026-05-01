@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 type Detail = {
-  type: 'youtube' | 'image';
+  type: 'youtube' | 'image' | 'video';
   src: string;
   title: string;
   category?: string;
@@ -83,6 +83,15 @@ export default function Lightbox() {
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
               allowFullScreen
               className="w-full h-full block"
+            />
+          ) : detail.type === 'video' ? (
+            <video
+              src={detail.src}
+              title={detail.title}
+              controls
+              autoPlay
+              playsInline
+              className="w-full h-full block bg-ink"
             />
           ) : (
             <img

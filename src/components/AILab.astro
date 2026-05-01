@@ -42,13 +42,19 @@ const aiProjects = (await getCollection('projects', ({ data }) => data.category 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
       {aiProjects.map((project, i) => {
         const number = String(i + 1).padStart(2, '0');
-        const ytSrc = project.data.media.type === 'youtube' ? project.data.media.src : '';
+        const m = project.data.media;
+        const lbType: 'youtube' | 'image' | 'video' =
+          m.type === 'youtube' || m.type === 'video' ? m.type : 'image';
+        const lbSrc =
+          m.type === 'gallery'
+            ? (m.images[0]?.src ?? project.data.thumbnail)
+            : m.src;
         const payload = JSON.stringify({
-          type: 'youtube',
-          src: ytSrc,
+          type: lbType,
+          src: lbSrc,
           title: project.data.title,
           category: 'AI Lab',
-          vertical: false,
+          vertical: project.data.vertical ?? false,
         });
 
         return (
