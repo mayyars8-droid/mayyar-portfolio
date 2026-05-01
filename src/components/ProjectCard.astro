@@ -128,7 +128,7 @@ const categoryLabel: Record<string, string> = {
 </article>
 
 <script>
-  const cards = document.querySelectorAll<HTMLElement>('[data-lightbox]');
+  const cards = document.querySelectorAll<HTMLElement>('#project-grid [data-lightbox]');
   cards.forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.preventDefault();
