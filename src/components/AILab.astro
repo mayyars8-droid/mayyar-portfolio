@@ -1,0 +1,140 @@
+---
+import { getCollection } from 'astro:content';
+
+const aiProjects = (await getCollection('projects', ({ data }) => data.category === 'ai'))
+  .sort((a, b) => (b.data.order ?? 0) - (a.data.order ?? 0));
+---
+
+<section
+  id="ai-lab"
+  class="relative py-24 sm:py-36 overflow-hidden bg-ink text-cream"
+>
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute -top-[15vmin] right-[10vmin] h-[55vmin] w-[55vmin] rounded-full bg-blue/55 blur-[160px] opacity-50"
+  ></div>
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute bottom-[10vmin] -left-[15vmin] h-[55vmin] w-[55vmin] rounded-full bg-coral/40 blur-[160px] opacity-40"
+  ></div>
+
+  <div class="relative max-w-7xl mx-auto px-6 sm:px-10">
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14">
+      <div>
+        <p class="font-mono text-xs tracking-[0.3em] text-cream/55" data-reveal>
+          // 03 · AI LAB
+        </p>
+        <h2
+          class="mt-5 font-display leading-[0.95] tracking-tight text-balance"
+          style="font-size: clamp(2.4rem, 7vw, 6.5rem);"
+          data-reveal
+        >
+          Generative tools, used like
+          <em class="not-italic text-coral">a film crew</em>.
+        </h2>
+      </div>
+      <p class="max-w-md text-cream/70 text-pretty" data-reveal>
+        AI doesn't replace taste — it amplifies it. These are workflows where
+        models, prompt design and traditional craft work together.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+      {aiProjects.map((project, i) => {
+        const number = String(i + 1).padStart(2, '0');
+        const m = project.data.media;
+        const lbType: 'youtube' | 'image' | 'video' =
+          m.type === 'youtube' || m.type === 'video' ? m.type : 'image';
+        const lbSrc =
+          m.type === 'gallery'
+            ? (m.images[0]?.src ?? project.data.thumbnail)
+            : m.src;
+        const payload = JSON.stringify({
+          type: lbType,
+          src: lbSrc,
+          title: project.data.title,
+          category: 'AI Lab',
+          vertical: project.data.vertical ?? false,
+        });
+
+        return (
+          <article
+            data-reveal
+            class="group relative overflow-hidden rounded-3xl border border-cream/10 bg-paper/[0.04] backdrop-blur-sm p-6 sm:p-8 hover:border-cream/25 transition-colors"
+          >
+            <div class="flex items-start justify-between mb-6">
+              <span class="font-mono text-xs tracking-[0.25em] text-cream/55">
+                {number}
+              </span>
+              <div class="flex flex-wrap gap-2 justify-end">
+                {project.data.tags.slice(0, 3).map((tag) => (
+                  <span class="font-mono text-[10px] tracking-[0.18em] uppercase border border-cream/20 rounded-full px-2.5 py-1 text-cream/80">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <h3 class="font-display text-2xl sm:text-3xl leading-tight">
+              {project.data.title}
+            </h3>
+            {project.data.tagline && (
+              <p class="mt-3 text-cream/70 text-sm sm:text-base">
+                {project.data.tagline}
+              </p>
+            )}
+
+            <button
+              type="button"
+              class="relative mt-7 block w-full rounded-2xl overflow-hidden bg-ink"
+              data-cursor-play
+              data-lightbox={payload}
+              aria-label={`Play ${project.data.title}`}
+            >
+              <div class="aspect-video relative">
+                <img
+                  src={project.data.thumbnail}
+                  alt={project.data.title}
+                  crossorigin="anonymous"
+                  class="thumb absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <span
+                  aria-hidden="true"
+                  class="thumb-fallback absolute inset-0 hidden bg-gradient-to-br from-blue via-coral/60 to-ink"
+                ></span>
+                <div class="absolute inset-0 bg-gradient-to-tr from-ink/60 via-transparent to-blue/30"></div>
+
+                <span aria-hidden="true" class="absolute inset-0 flex items-center justify-center">
+                  <span class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-cream text-ink shadow-xl group-hover:bg-coral group-hover:text-cream transition-colors">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M8 5v14l11-7-11-7z" />
+                    </svg>
+                  </span>
+                </span>
+
+                <span class="absolute top-3 left-3 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-cream/95 text-ink font-mono text-[10px] tracking-[0.2em] uppercase">
+                  <span class="w-1.5 h-1.5 rounded-full bg-coral animate-pulse"></span>
+                  AI Workflow
+                </span>
+              </div>
+            </button>
+          </article>
+        );
+      })}
+    </div>
+  </div>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('#ai-lab [data-lightbox]').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      try {
+        const payload = JSON.parse(btn.getAttribute('data-lightbox') ?? '{}');
+        window.dispatchEvent(new CustomEvent('lightbox:open', { detail: payload }));
+      } catch {}
+    });
+  });
+</script>

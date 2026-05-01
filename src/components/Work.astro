@@ -1,0 +1,181 @@
+---
+import { getCollection } from 'astro:content';
+import { CATEGORIES } from '@/lib/site';
+import ProjectCard from './ProjectCard.astro';
+
+const all = await getCollection('projects');
+// Filter out AI projects from the main grid (they get their own dedicated section)
+// and split design from video-led work for richer layouts.
+const projects = all
+  .filter((p) => p.data.category !== 'ai')
+  .sort((a, b) => (b.data.order ?? 0) - (a.data.order ?? 0));
+
+const filterableCategories = CATEGORIES.filter((c) => c.id !== 'ai');
+---
+
+<section id="work" class="relative py-24 sm:py-36 overflow-hidden">
+  <div class="max-w-7xl mx-auto px-6 sm:px-10">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-12">
+      <div>
+        <p class="font-mono text-xs tracking-[0.3em] text-ink-soft" data-reveal>
+          // 02 · SELECTED WORK
+        </p>
+        <h2
+          class="mt-5 font-display leading-[0.95] tracking-tight text-balance"
+          style="font-size: clamp(2.4rem, 7vw, 6.5rem);"
+          data-reveal
+        >
+          A reel of <em class="not-italic text-coral">moving pictures</em>,
+          <br />and the design that makes them sing.
+        </h2>
+      </div>
+      <p class="max-w-md text-ink-soft text-pretty" data-reveal>
+        Filter by discipline. Each project opens in a fullscreen viewer.
+        The full library lives in a content folder — adding new work is a
+        one-file commit.
+      </p>
+    </div>
+
+    <div
+      class="flex flex-wrap items-center gap-2 mb-10"
+      role="tablist"
+      aria-label="Filter projects by category"
+      data-reveal
+    >
+      <button
+        type="button"
+        class="filter-btn is-active group"
+        data-filter="all"
+        role="tab"
+        aria-selected="true"
+        data-cursor-link
+      >
+        <span class="filter-dot"></span>
+        All
+        <span class="filter-count" data-count-all>{projects.length}</span>
+      </button>
+      {filterableCategories.map((c) => (
+        <button
+          type="button"
+          class="filter-btn"
+          data-filter={c.id}
+          role="tab"
+          aria-selected="false"
+          data-cursor-link
+        >
+          <span class="filter-dot"></span>
+          {c.label}
+          <span class="filter-count" data-count-cat={c.id}>
+            {projects.filter((p) => p.data.category === c.id).length}
+          </span>
+        </button>
+      ))}
+    </div>
+
+    <div
+      id="project-grid"
+      class="grid grid-cols-2 sm:grid-cols-12 gap-3 sm:gap-6 auto-rows-[180px] sm:auto-rows-[260px]"
+    >
+      {projects.map((project, i) => {
+        const isVertical = project.data.vertical;
+        const isImage = project.data.media.type === 'image';
+        const isFeatured = project.data.featured;
+
+        // Asymmetric grid: cols-2 mobile, cols-12 desktop.
+        let span = 'col-span-2 sm:col-span-6 lg:col-span-4 row-span-2';
+        if (isVertical) {
+          span = 'col-span-1 sm:col-span-4 lg:col-span-3 row-span-2 sm:row-span-3';
+        } else if (isFeatured && i % 5 === 0) {
+          span = 'col-span-2 sm:col-span-8 lg:col-span-7 row-span-2 sm:row-span-3';
+        } else if (isFeatured && i % 5 === 2) {
+          span = 'col-span-2 sm:col-span-6 lg:col-span-5 row-span-2';
+        } else if (isImage) {
+          span = 'col-span-1 sm:col-span-4 lg:col-span-3 row-span-2';
+        }
+
+        return (
+          <ProjectCard
+            project={project}
+            spanClass={span}
+            indexLabel={String(i + 1).padStart(2, '0')}
+          />
+        );
+      })}
+    </div>
+
+    <p
+      id="empty-state"
+      class="hidden mt-12 text-center text-ink-soft font-mono text-sm tracking-wider"
+    >
+      Nothing in this category yet — check back soon.
+    </p>
+  </div>
+</section>
+
+<style>
+  .filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.55rem 1.1rem;
+    border-radius: 9999px;
+    border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+    background: var(--color-paper);
+    color: var(--color-ink-soft);
+    font-size: 0.85rem;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  }
+  .filter-btn:hover {
+    color: var(--color-ink);
+    border-color: color-mix(in srgb, var(--color-ink) 30%, transparent);
+    transform: translateY(-1px);
+  }
+  .filter-btn.is-active {
+    background: var(--color-ink);
+    color: var(--color-cream);
+    border-color: var(--color-ink);
+  }
+  .filter-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background: var(--color-coral);
+    display: inline-block;
+  }
+  .filter-btn.is-active .filter-dot {
+    background: var(--color-cream);
+  }
+  .filter-count {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    opacity: 0.7;
+  }
+</style>
+
+<script>
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
+  const grid = document.getElementById('project-grid');
+  const empty = document.getElementById('empty-state');
+
+  if (grid) {
+    const cards = Array.from(grid.querySelectorAll<HTMLElement>('[data-card]'));
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const filter = btn.dataset.filter ?? 'all';
+        buttons.forEach((b) => {
+          const active = b === btn;
+          b.classList.toggle('is-active', active);
+          b.setAttribute('aria-selected', String(active));
+        });
+        let visible = 0;
+        cards.forEach((card) => {
+          const cat = card.dataset.category;
+          const show = filter === 'all' || cat === filter;
+          card.classList.toggle('hidden', !show);
+          if (show) visible++;
+        });
+        if (empty) empty.classList.toggle('hidden', visible !== 0);
+      });
+    });
+  }
+</script>
