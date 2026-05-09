@@ -61,25 +61,30 @@ const visibleCats = CATEGORIES.filter((c) => c.id !== 'ai');
   </div>
 </section>
 
-<script>
-  (() => {
-    const grid = document.getElementById('work-grid');
-    const count = document.getElementById('work-count');
+<script is:inline>
+  // Inline so it runs synchronously after the work section is parsed.
+  // Bundled <script> tags loaded via Astro's dev pipeline were not
+  // attaching click handlers reliably, leaving the filter inert.
+  (function () {
+    var grid = document.getElementById('work-grid');
+    var count = document.getElementById('work-count');
     if (!grid) return;
-    const tabs = document.querySelectorAll<HTMLButtonElement>('#work .tab');
-    const cells = grid.querySelectorAll<HTMLElement>('.work-cell');
-    function applyFilter(cat: string) {
-      let shown = 0;
-      cells.forEach((cell) => {
-        const ok = cat === 'all' || cell.dataset.cat === cat;
+    var tabs = document.querySelectorAll('#work .tab');
+    var cells = grid.querySelectorAll('.work-cell');
+    function applyFilter(cat) {
+      var shown = 0;
+      cells.forEach(function (cell) {
+        var ok = cat === 'all' || cell.dataset.cat === cat;
         cell.style.display = ok ? '' : 'none';
         if (ok) shown++;
       });
-      if (count) count.textContent = `${shown} project${shown === 1 ? '' : 's'}`;
+      if (count) count.textContent = shown + ' project' + (shown === 1 ? '' : 's');
     }
-    tabs.forEach((tab) => {
-      tab.addEventListener('click', () => {
-        tabs.forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        tabs.forEach(function (t) {
+          t.setAttribute('aria-selected', String(t === tab));
+        });
         applyFilter(tab.dataset.filter || 'all');
       });
     });
