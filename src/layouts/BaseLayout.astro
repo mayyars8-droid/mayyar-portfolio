@@ -221,8 +221,19 @@ const personJsonLd = {
         tick();
 
         /* Active nav link -------------------------------------------------- */
-        const sectionIds = Array.from(document.querySelectorAll<HTMLElement>('main section[id]')).map((s) => s.id);
+        // Only observe sections that have a corresponding nav link, otherwise
+        // sections like #top or #about (which intentionally have no nav entry)
+        // would clear the active highlight as the user scrolls past them.
         const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]'));
+        const navHrefs = new Set(
+          navLinks
+            .map((l) => l.getAttribute('href') || '')
+            .filter((h) => h.startsWith('#'))
+            .map((h) => h.slice(1)),
+        );
+        const sectionIds = Array.from(document.querySelectorAll<HTMLElement>('main section[id]'))
+          .map((s) => s.id)
+          .filter((id) => navHrefs.has(id));
         const navObs = new IntersectionObserver(
           (entries) => {
             entries.forEach((entry) => {
@@ -275,8 +286,13 @@ const personJsonLd = {
             .replace(/"/g, '&quot;')
             .replace(/</g, '&lt;')
             .replace(/>/g, '&gt;');
+        // Generation counter — incremented on every open/close so deferred
+        // cleanup callbacks from a previous close can detect they're stale
+        // (e.g. user reopens the lightbox during the 0.4s fade-out).
+        let lightboxGen = 0;
         function openLightbox(payload: { type: string; src: string; vertical?: boolean; alt?: string }) {
           if (!lightbox || !lightboxFrame) return;
+          lightboxGen++;
           lightboxFrame.className = 'lightbox-frame' + (payload.vertical ? ' vertical' : '');
           const safeSrc = escAttr(payload.src);
           const safeAlt = escAttr(payload.alt || '');
@@ -295,6 +311,8 @@ const personJsonLd = {
         }
         function closeLightbox() {
           if (!lightbox || !lightboxFrame) return;
+          lightboxGen++;
+          const myGen = lightboxGen;
           // 1. Stop playback immediately so audio cuts off, but keep the DOM
           //    around so the 0.4s opacity fade-out has something to fade.
           const ifr = lightboxFrame.querySelector('iframe');
@@ -306,10 +324,13 @@ const personJsonLd = {
           lightbox.classList.remove('is-open');
           document.body.style.overflow = '';
           // 2. Once the overlay has fully faded, clear contents and aria-hide.
+          //    Bail out if a new open has happened while we were waiting,
+          //    otherwise we'd wipe the user's freshly-opened content.
           let cleaned = false;
           const cleanup = () => {
             if (cleaned) return;
             cleaned = true;
+            if (myGen !== lightboxGen) return;
             if (!lightbox || !lightboxFrame) return;
             lightboxFrame.innerHTML = '';
             lightbox.setAttribute('aria-hidden', 'true');
