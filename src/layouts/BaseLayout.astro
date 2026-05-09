@@ -176,6 +176,7 @@ const personJsonLd = {
         function setMenu(open: boolean) {
           if (!mobileMenu || !menuToggle) return;
           mobileMenu.classList.toggle('is-open', open);
+          mobileMenu.setAttribute('aria-hidden', String(!open));
           menuToggle.setAttribute('aria-expanded', String(open));
           document.body.style.overflow = open ? 'hidden' : '';
         }
@@ -262,19 +263,28 @@ const personJsonLd = {
         const lightbox = document.getElementById('lightbox');
         const lightboxFrame = document.getElementById('lightbox-frame');
         const lightboxClose = document.getElementById('lightbox-close');
+        const escAttr = (s: string) =>
+          s
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
         function openLightbox(payload: { type: string; src: string; vertical?: boolean; alt?: string }) {
           if (!lightbox || !lightboxFrame) return;
           lightboxFrame.className = 'lightbox-frame' + (payload.vertical ? ' vertical' : '');
+          const safeSrc = escAttr(payload.src);
+          const safeAlt = escAttr(payload.alt || '');
           if (payload.type === 'youtube') {
-            const sep = payload.src.includes('?') ? '&' : '?';
-            lightboxFrame.innerHTML = `<iframe src="${payload.src}${sep}autoplay=1&rel=0" title="Video" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+            const sep = payload.src.includes('?') ? '&amp;' : '?';
+            lightboxFrame.innerHTML = `<iframe src="${safeSrc}${sep}autoplay=1&amp;rel=0" title="Video" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
           } else if (payload.type === 'image') {
-            lightboxFrame.innerHTML = `<img src="${payload.src}" alt="${payload.alt || ''}" />`;
+            lightboxFrame.innerHTML = `<img src="${safeSrc}" alt="${safeAlt}" />`;
           } else if (payload.type === 'video') {
-            lightboxFrame.innerHTML = `<video src="${payload.src}" controls autoplay playsinline></video>`;
+            lightboxFrame.innerHTML = `<video src="${safeSrc}" controls autoplay playsinline></video>`;
           }
-          lightbox.classList.add('is-open');
           lightbox.setAttribute('aria-hidden', 'false');
+          // Force reflow so the opacity transition kicks in (visibility-based hide).
+          requestAnimationFrame(() => lightbox.classList.add('is-open'));
           document.body.style.overflow = 'hidden';
         }
         function closeLightbox() {
