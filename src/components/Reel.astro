@@ -10,7 +10,9 @@ import { getCollection } from 'astro:content';
 
 const all = await getCollection('projects');
 
-// Hero reel: prefer the editing reel if available
+// Hero reel: prefer the motion reel (16:9 — fits the .reel-stage CSS aspect-ratio).
+// edit-reel is a fallback because it's vertical 9:16 and would crop awkwardly in
+// the 16:9 stage; we'd only use it if motion-reel is missing entirely.
 const reelHero =
   all.find((p) => p.id.includes('motion-reel')) ||
   all.find((p) => p.id.includes('edit-reel')) ||
