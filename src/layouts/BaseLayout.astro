@@ -1,32 +1,98 @@
 ---
+/**
+ * Top-level layout.
+ *
+ * Responsibilities:
+ *  - Document head (SEO, OG, Twitter, JSON-LD)
+ *  - Theme bootstrap (light/dark, persisted in localStorage)
+ *  - Preloader, scroll-progress bar, lightbox container
+ *  - Global JS: theme toggle, mobile menu, scroll reveal,
+ *    rotating role headline, lightbox, video preview
+ *
+ * No external JS dependencies — vanilla DOM APIs only, so the static
+ * Astro output ships with minimal client weight.
+ */
 import '@/styles/global.css';
 import { SITE } from '@/lib/site';
 import Header from '@/components/Header.astro';
 import Footer from '@/components/Footer.astro';
-import Cursor from '@/components/react/Cursor';
 
 interface Props {
   title?: string;
   description?: string;
 }
+
 const { title, description = SITE.description } = Astro.props;
 const fullTitle = title ? `${title} — ${SITE.title}` : `${SITE.title} · ${SITE.tagline}`;
+const canonical = SITE.url;
+
+const personJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: SITE.author,
+  jobTitle: 'Filmmaker · Visual Designer · AI Specialist',
+  url: SITE.url,
+  email: `mailto:${SITE.email}`,
+  image: SITE.portrait,
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Irbid',
+    addressCountry: 'JO',
+  },
+  sameAs: [SITE.social.linkedin, SITE.social.linktree],
+};
 ---
 
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="generator" content={Astro.generator} />
+
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Theme color reflects the active theme; updated on toggle -->
+    <meta name="theme-color" id="theme-color-meta" content="#FAF7F2" />
+
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate icon" href="/favicon.ico" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
-    <meta property="og:type" content="website" />
-    <meta name="theme-color" content="#FAF7F2" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={SITE.ogImage} />
+    <meta property="og:site_name" content={SITE.title} />
 
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={SITE.ogImage} />
+
+    <!-- Person JSON-LD -->
+    <script is:inline type="application/ld+json" set:html={JSON.stringify(personJsonLd)} />
+
+    <!-- Theme bootstrap (runs before paint to avoid flash) -->
+    <script is:inline>
+      (function () {
+        try {
+          var saved = localStorage.getItem('theme');
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          var theme = saved || (prefersDark ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+          var meta = document.getElementById('theme-color-meta');
+          if (meta) meta.setAttribute('content', theme === 'dark' ? '#07070A' : '#FAF7F2');
+        } catch (e) { /* fallthrough to default light */ }
+      })();
+    </script>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -34,38 +100,279 @@ const fullTitle = title ? `${title} — ${SITE.title}` : `${SITE.title} · ${SIT
       rel="stylesheet"
     />
   </head>
-  <body class="bg-cream text-ink antialiased">
-    <Cursor client:idle />
+  <body class="antialiased">
+    <!-- Preloader -->
+    <div class="preloader" id="preloader" role="status" aria-label="Loading">
+      <div class="preloader-meta">
+        <span class="preloader-rec">REC · 00:00:01</span>
+        <span>FRAME 001</span>
+      </div>
+      <div class="preloader-name">
+        <span>Mayyar</span>
+        <em id="pre-role">Visual Designer</em>
+      </div>
+      <div class="preloader-bar"></div>
+    </div>
+
+    <!-- Scroll progress -->
+    <div class="scroll-progress" id="scroll-progress" aria-hidden="true"></div>
+
     <Header />
+
     <main>
       <slot />
     </main>
+
     <Footer />
 
+    <!-- Lightbox -->
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-hidden="true">
+      <button class="lightbox-close" id="lightbox-close" aria-label="Close">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"/></svg>
+      </button>
+      <div class="lightbox-frame" id="lightbox-frame"></div>
+    </div>
+
+    <!-- Site-wide interactions (vanilla, no deps) -->
     <script>
-      // Reveal-on-scroll
-      if (typeof window !== 'undefined') {
+      (() => {
+        const root = document.documentElement;
+
+        /* Preloader -------------------------------------------------------- */
+        const preloader = document.getElementById('preloader');
+        const preRole = document.getElementById('pre-role');
+        const roles = ['Visual Designer', 'AI Specialist', 'Filmmaker', 'Video Editor'];
+        let preIdx = 0;
+        const roleInt = window.setInterval(() => {
+          preIdx = (preIdx + 1) % roles.length;
+          if (preRole) preRole.textContent = roles[preIdx];
+        }, 380);
+        window.addEventListener('load', () => {
+          window.setTimeout(() => {
+            window.clearInterval(roleInt);
+            preloader?.classList.add('is-done');
+          }, 1500);
+        });
+
+        /* Theme toggle ----------------------------------------------------- */
+        const meta = document.getElementById('theme-color-meta');
+        function setTheme(t: string, persist = true) {
+          root.setAttribute('data-theme', t);
+          if (persist) {
+            try { localStorage.setItem('theme', t); } catch {}
+          }
+          if (meta) meta.setAttribute('content', t === 'dark' ? '#07070A' : '#FAF7F2');
+        }
+        document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]').forEach((btn) => {
+          btn.addEventListener('click', () => {
+            const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            setTheme(next);
+          });
+        });
+
+        /* Mobile menu ------------------------------------------------------ */
+        const menuToggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+        const mobileMenu = document.getElementById('mobile-menu');
+        function setMenu(open: boolean) {
+          if (!mobileMenu || !menuToggle) return;
+          mobileMenu.classList.toggle('is-open', open);
+          mobileMenu.setAttribute('aria-hidden', String(!open));
+          menuToggle.setAttribute('aria-expanded', String(open));
+          document.body.style.overflow = open ? 'hidden' : '';
+        }
+        menuToggle?.addEventListener('click', () => {
+          setMenu(!mobileMenu?.classList.contains('is-open'));
+        });
+        mobileMenu?.querySelectorAll('a').forEach((a) => {
+          a.addEventListener('click', () => setMenu(false));
+        });
+        // Esc closes the mobile menu (mirrors lightbox behaviour).
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && mobileMenu?.classList.contains('is-open')) {
+            setMenu(false);
+          }
+        });
+
+        /* Scroll reveal ---------------------------------------------------- */
         const reveal = (el: Element) => el.classList.add('is-visible');
-        const observer = new IntersectionObserver(
+        const revealObserver = new IntersectionObserver(
           (entries) => {
             for (const entry of entries) {
               if (entry.isIntersecting) {
                 reveal(entry.target);
-                observer.unobserve(entry.target);
+                revealObserver.unobserve(entry.target);
               }
             }
           },
           { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
         );
-        const init = () => {
-          document.querySelectorAll('[data-reveal]').forEach((el) => observer.observe(el));
-        };
-        if (document.readyState === 'loading') {
-          document.addEventListener('DOMContentLoaded', init);
-        } else {
-          init();
+        document.querySelectorAll('[data-reveal], [data-reveal-clip]').forEach((el) => revealObserver.observe(el));
+
+        /* Scroll progress -------------------------------------------------- */
+        const progress = document.getElementById('scroll-progress');
+        function tick() {
+          if (!progress) return;
+          const h = document.documentElement;
+          const max = h.scrollHeight - h.clientHeight;
+          const pct = max > 0 ? (h.scrollTop / max) * 100 : 0;
+          progress.style.width = pct + '%';
         }
-      }
+        document.addEventListener('scroll', tick, { passive: true });
+        tick();
+
+        /* Active nav link -------------------------------------------------- */
+        // Only observe sections that have a corresponding nav link, otherwise
+        // sections like #top or #about (which intentionally have no nav entry)
+        // would clear the active highlight as the user scrolls past them.
+        const navLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('[data-nav-link]'));
+        const navHrefs = new Set(
+          navLinks
+            .map((l) => l.getAttribute('href') || '')
+            .filter((h) => h.startsWith('#'))
+            .map((h) => h.slice(1)),
+        );
+        const sectionIds = Array.from(document.querySelectorAll<HTMLElement>('main section[id]'))
+          .map((s) => s.id)
+          .filter((id) => navHrefs.has(id));
+        const navObs = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const id = entry.target.id;
+                navLinks.forEach((l) => {
+                  l.toggleAttribute('data-active', l.getAttribute('href') === '#' + id);
+                });
+              }
+            });
+          },
+          { rootMargin: '-40% 0px -55% 0px', threshold: 0 },
+        );
+        sectionIds.forEach((id) => {
+          const el = document.getElementById(id);
+          if (el) navObs.observe(el);
+        });
+
+        /* Hero role rotator ------------------------------------------------ */
+        const rotator = document.querySelector<HTMLElement>('[data-rotator]');
+        if (rotator) {
+          const items = (rotator.dataset.roles || '').split('|');
+          let idx = 0;
+          const target = rotator.querySelector('span');
+          if (target && items.length) {
+            target.textContent = items[0];
+            window.setInterval(() => {
+              idx = (idx + 1) % items.length;
+              if (target) {
+                target.style.opacity = '0';
+                target.style.transform = 'translateY(8px)';
+                window.setTimeout(() => {
+                  target.textContent = items[idx];
+                  target.style.opacity = '1';
+                  target.style.transform = 'translateY(0)';
+                }, 220);
+              }
+            }, 2400);
+            target.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+          }
+        }
+
+        /* Lightbox --------------------------------------------------------- */
+        const lightbox = document.getElementById('lightbox');
+        const lightboxFrame = document.getElementById('lightbox-frame');
+        const lightboxClose = document.getElementById('lightbox-close');
+        const escAttr = (s: string) =>
+          s
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        // Generation counter — incremented on every open/close so deferred
+        // cleanup callbacks from a previous close can detect they're stale
+        // (e.g. user reopens the lightbox during the 0.4s fade-out).
+        let lightboxGen = 0;
+        function openLightbox(payload: { type: string; src: string; vertical?: boolean; alt?: string }) {
+          if (!lightbox || !lightboxFrame) return;
+          lightboxGen++;
+          lightboxFrame.className = 'lightbox-frame' + (payload.vertical ? ' vertical' : '');
+          const safeSrc = escAttr(payload.src);
+          const safeAlt = escAttr(payload.alt || '');
+          if (payload.type === 'youtube') {
+            const sep = payload.src.includes('?') ? '&amp;' : '?';
+            // Match the permissions YouTube embeds need for full playback
+            // (DRM via encrypted-media, sensor-based player UI, etc.).
+            lightboxFrame.innerHTML = `<iframe src="${safeSrc}${sep}autoplay=1&amp;rel=0" title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
+          } else if (payload.type === 'image') {
+            lightboxFrame.innerHTML = `<img src="${safeSrc}" alt="${safeAlt}" />`;
+          } else if (payload.type === 'video') {
+            lightboxFrame.innerHTML = `<video src="${safeSrc}" controls autoplay playsinline></video>`;
+          }
+          lightbox.setAttribute('aria-hidden', 'false');
+          // Force reflow so the opacity transition kicks in (visibility-based hide).
+          requestAnimationFrame(() => lightbox.classList.add('is-open'));
+          document.body.style.overflow = 'hidden';
+        }
+        function closeLightbox() {
+          if (!lightbox || !lightboxFrame) return;
+          lightboxGen++;
+          const myGen = lightboxGen;
+          // 1. Stop playback immediately so audio cuts off, but keep the DOM
+          //    around so the 0.4s opacity fade-out has something to fade.
+          const ifr = lightboxFrame.querySelector('iframe');
+          if (ifr) ifr.src = 'about:blank';
+          const vid = lightboxFrame.querySelector('video');
+          if (vid) {
+            try { vid.pause(); } catch { /* ignore */ }
+          }
+          lightbox.classList.remove('is-open');
+          document.body.style.overflow = '';
+          // 2. Once the overlay has fully faded, clear contents and aria-hide.
+          //    Bail out if a new open has happened while we were waiting,
+          //    otherwise we'd wipe the user's freshly-opened content.
+          let cleaned = false;
+          const cleanup = () => {
+            if (cleaned) return;
+            cleaned = true;
+            if (myGen !== lightboxGen) return;
+            if (!lightbox || !lightboxFrame) return;
+            lightboxFrame.innerHTML = '';
+            lightbox.setAttribute('aria-hidden', 'true');
+          };
+          lightbox.addEventListener('transitionend', cleanup, { once: true });
+          window.setTimeout(cleanup, 500);
+        }
+        lightboxClose?.addEventListener('click', closeLightbox);
+        lightbox?.addEventListener('click', (e) => {
+          if (e.target === lightbox) closeLightbox();
+        });
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && lightbox?.classList.contains('is-open')) {
+            closeLightbox();
+          }
+        });
+
+        document.querySelectorAll<HTMLElement>('[data-media]').forEach((el) => {
+          el.addEventListener('click', () => {
+            try {
+              const data = JSON.parse(el.dataset.media || '{}');
+              openLightbox(data);
+            } catch {}
+          });
+          el.addEventListener('keydown', (e: KeyboardEvent) => {
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            // Don't hijack Enter/Space when the keypress originated on a
+            // descendant interactive control (e.g. a project's external link).
+            const target = e.target as HTMLElement;
+            if (target !== el && target.closest('a, button, input, select, textarea, [role="button"]')) {
+              return;
+            }
+            e.preventDefault();
+            try {
+              const data = JSON.parse(el.dataset.media || '{}');
+              openLightbox(data);
+            } catch {}
+          });
+        });
+      })();
     </script>
   </body>
 </html>

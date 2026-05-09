@@ -1,0 +1,131 @@
+---
+/**
+ * "Vision" section — the four-dimension narrative.
+ * Vision → Intelligence → Motion → Impact.
+ */
+import { DIMENSIONS } from '@/lib/site';
+---
+
+<section id="vision" class="vision">
+  <div class="wrap">
+    <header class="vision-head">
+      <span class="eyebrow" data-reveal>One creative · four dimensions</span>
+      <h2 class="vision-title" data-reveal style="--reveal-delay: 80ms;">
+        From <em>Vision</em> to <em>Intelligence</em><br/>
+        to <em>Motion</em> to <em>Impact</em>.
+      </h2>
+      <p class="vision-lede text-pretty" data-reveal style="--reveal-delay: 160ms;">
+        I bring four practices into one studio — designed to compress production
+        cycles, sharpen creative direction and ship work that earns attention on
+        every channel.
+      </p>
+    </header>
+
+    <ol class="vision-grid" role="list">
+      {DIMENSIONS.map((d, i) => (
+        <li class="vision-card" data-reveal style={`--reveal-delay: ${120 + i * 80}ms;`}>
+          <div class="vision-card-meta">
+            <span class="vc-code">{d.code}</span>
+            <span class="vc-label">{d.label}</span>
+          </div>
+          <h3 class="vc-title">{d.title}</h3>
+          <p class="vc-blurb">{d.blurb}</p>
+          <span class="vc-line" aria-hidden="true"></span>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .vision {
+    padding-block: clamp(5rem, 12vw, 8rem);
+    position: relative;
+  }
+  .vision-head {
+    max-width: 60rem;
+    display: flex; flex-direction: column; gap: 1.25rem;
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+  }
+  .vision-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .vision-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .vision-lede {
+    color: var(--fg-soft);
+    max-width: 56ch;
+    font-size: clamp(1rem, 1.3vw, 1.1rem);
+    line-height: 1.6;
+  }
+
+  .vision-grid {
+    list-style: none;
+    margin: 0; padding: 0;
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--bg-elev);
+  }
+  @media (min-width: 700px) { .vision-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1100px) { .vision-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+  .vision-card {
+    position: relative;
+    padding: 2rem 1.6rem 2.2rem;
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    display: flex; flex-direction: column;
+    min-height: 220px;
+  }
+  .vision-card:last-child { border-right: 0; }
+  @media (min-width: 700px) {
+    .vision-card:nth-child(2n) { border-right: 0; }
+    .vision-card:nth-child(2n+1) { border-right: 1px solid var(--line); }
+    .vision-card:nth-last-child(-n+2) { border-bottom: 0; }
+  }
+  @media (min-width: 1100px) {
+    .vision-card { border-right: 1px solid var(--line) !important; border-bottom: 0 !important; }
+    .vision-card:last-child { border-right: 0 !important; }
+  }
+  .vision-card-meta {
+    display: flex; align-items: center; gap: 0.7rem;
+    font-family: var(--font-mono); font-size: 0.7rem;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--mute);
+    margin-bottom: 1.2rem;
+  }
+  .vc-code {
+    width: 26px; height: 26px;
+    display: grid; place-items: center;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 999px;
+    font-size: 0.7rem;
+  }
+  .vc-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.15rem, 1.6vw, 1.4rem);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.7rem;
+  }
+  .vc-blurb {
+    color: var(--fg-soft);
+    font-size: 0.94rem;
+    line-height: 1.55;
+  }
+  .vc-line {
+    position: absolute;
+    left: 1.6rem; right: 1.6rem; bottom: 1.6rem;
+    height: 1px; background: var(--line);
+  }
+</style>

@@ -1,84 +1,143 @@
 ---
+/**
+ * About — personal narrative + portrait + quick stats.
+ */
 import { SITE } from '@/lib/site';
 ---
 
-<section id="about" class="relative py-24 sm:py-36 overflow-hidden">
-  <div class="max-w-5xl mx-auto px-6 sm:px-10">
-    <p class="font-mono text-xs tracking-[0.3em] text-ink-soft" data-reveal>
-      // 05 · THE SCRIPT
-    </p>
-
-    <p
-      class="mt-6 font-display text-coral text-lg sm:text-xl tracking-tight"
-      data-reveal
-    >
-      Hi, I'm Mayyar Al-Sharqawi.
-    </p>
-
-    <h2
-      class="mt-2 font-display leading-[1.02] tracking-tight text-balance"
-      style="font-size: clamp(2.2rem, 6.5vw, 6rem);"
-      data-reveal
-    >
-      It's not just about the tools.<br />
-      It's about the <em class="not-italic text-coral">story</em>.
-    </h2>
-
-    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-10">
-      <div class="space-y-5 text-ink-soft text-base sm:text-lg text-pretty" data-reveal>
-        <p>
-          A top-ranked design graduate with expertise in social media design,
-          filmmaking, and video editing. Over four years across freelance work,
-          social media agencies, and NGOs — I excel in visual storytelling that
-          connects and captivates.
-        </p>
-        <p>
-          I also run
-          <a
-            href="#twig-tech"
-            data-cursor-link
-            class="text-blue underline underline-offset-4 decoration-2 decoration-blue/40 hover:decoration-blue"
-          >
-            {SITE.twigTech}
-          </a>
-          — an Arabic tech content brand exploring the intersection of
-          technology and creativity. My passion extends to AI-powered
-          workflows and 3D visualization, always pushing the boundaries of
-          what’s possible.
-        </p>
+<section id="about" class="about grain">
+  <div class="wrap about-inner">
+    <div class="about-image" data-reveal>
+      <div class="about-frame">
+        <img
+          src={SITE.portrait}
+          alt={`${SITE.author} portrait`}
+          loading="lazy"
+          decoding="async"
+          width="800"
+          height="1000"
+        />
+        <span class="about-frame-tag">FRAME · 042</span>
       </div>
+      <div class="about-stamp">
+        <span class="stamp-row">{SITE.award}</span>
+        <span class="stamp-row">·</span>
+        <span class="stamp-row">{SITE.awardSecondary}</span>
+      </div>
+    </div>
 
-      <div class="space-y-5" data-reveal>
-        <div class="rounded-3xl border border-ink/10 bg-paper p-6 sm:p-8">
-          <p class="font-mono text-[10px] tracking-[0.25em] uppercase text-ink-soft">
-            Currently
-          </p>
-          <p class="mt-3 font-display text-2xl leading-tight">
-            Head of Media Department at
-            <span class="text-coral">High Gate Academy</span>.
-          </p>
-          <p class="mt-3 text-ink-soft">
-            Building the institution’s visual narrative — film, design and
-            social — and supervising a small media team.
-          </p>
-        </div>
+    <div class="about-copy">
+      <span class="eyebrow" data-reveal>About · The maker behind the work</span>
+      <h2 class="about-headline text-balance" data-reveal style="--reveal-delay: 80ms;">
+        I make things that <em>look</em> good and <em>perform</em>.
+      </h2>
 
-        <div class="rounded-3xl border border-ink/10 bg-cream-2/60 p-6 sm:p-8">
-          <p class="font-mono text-[10px] tracking-[0.25em] uppercase text-ink-soft">
-            Studio toolkit
-          </p>
-          <ul class="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 text-ink text-sm">
-            <li>· Premiere Pro</li>
-            <li>· DaVinci Resolve</li>
-            <li>· After Effects</li>
-            <li>· Cinema 4D</li>
-            <li>· Photoshop · Illustrator</li>
-            <li>· Figma</li>
-            <li>· Midjourney · SD</li>
-            <li>· Runway · Kling</li>
-          </ul>
-        </div>
+      <div class="about-body" data-reveal style="--reveal-delay: 160ms;">
+        <p>
+          Born in <strong>Irbid, Jordan</strong>, I trained as a visual designer at the
+          Jordan University of Science and Technology, where I graduated as <strong>top of
+          my batch</strong>. Since then I've spent every year deepening my craft across
+          design, film, editing and AI — each discipline sharpening the next.
+        </p>
+        <p>
+          Today I lead media at <strong>High Gate Academy</strong>, run a top-rated
+          freelance practice on Upwork, and partner with brands and studios on
+          campaigns, films, and AI-driven content systems. I work in-house with my own
+          production setup, which means I can move from concept to camera to cut to
+          delivery without losing momentum.
+        </p>
+        <p class="about-philosophy">
+          <span class="philosophy-tag">Creative Philosophy</span>
+          A great frame is engineered, not stumbled upon. I treat every project — a
+          15-second reel or a 5-minute documentary — as a small piece of cinema with
+          a beginning, a middle, and a reason to exist.
+        </p>
       </div>
     </div>
   </div>
 </section>
+
+<style>
+  .about {
+    padding-block: clamp(5rem, 12vw, 8rem);
+    background: var(--bg-elev);
+    border-block: 1px solid var(--line);
+  }
+  .about-inner {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2.5rem, 5vw, 4rem);
+    align-items: start;
+  }
+  @media (min-width: 980px) {
+    .about-inner { grid-template-columns: minmax(280px, 420px) 1fr; }
+  }
+
+  .about-image { position: relative; }
+  .about-frame {
+    position: relative;
+    border: 1px solid var(--line-strong);
+    border-radius: 16px;
+    overflow: hidden;
+    background: var(--bg);
+  }
+  .about-frame img { aspect-ratio: 4 / 5; object-fit: cover; width: 100%; height: auto; }
+  .about-frame-tag {
+    position: absolute;
+    top: 12px; left: 12px;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.16em;
+    color: #fff;
+    background: rgba(7,7,10,0.6);
+    backdrop-filter: blur(6px);
+    padding: 0.3rem 0.55rem;
+    border-radius: 4px;
+  }
+
+  .about-stamp {
+    margin-top: 1.4rem;
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+    color: var(--mute);
+  }
+  .stamp-row { padding: 0.3rem 0.6rem; border: 1px dashed var(--line-strong); border-radius: 999px; }
+
+  .about-copy { display: flex; flex-direction: column; gap: 1.2rem; }
+  .about-headline {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .about-headline em { font-style: italic; color: var(--accent); }
+
+  .about-body { display: flex; flex-direction: column; gap: 1rem; max-width: 60ch; }
+  .about-body p {
+    color: var(--fg-soft);
+    font-size: clamp(1rem, 1.2vw, 1.06rem);
+    line-height: 1.65;
+  }
+  .about-body strong { color: var(--fg); font-weight: 600; }
+
+  .about-philosophy {
+    margin-top: 0.5rem;
+    padding: 1.2rem 1.3rem;
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 12px;
+    background: var(--surface);
+  }
+  .philosophy-tag {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.6rem;
+  }
+</style>
