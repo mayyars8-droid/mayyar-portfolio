@@ -21,8 +21,15 @@ const supporting = all
   .sort((a, b) => (b.data.order ?? 0) - (a.data.order ?? 0))
   .slice(0, 8);
 
+// Lightbox only renders youtube/image/video — collapse gallery to its first frame.
+function toLightboxMedia(p: typeof all[number]) {
+  return p.data.media.type === 'gallery'
+    ? { type: 'image' as const, src: p.data.media.images[0]?.src ?? p.data.thumbnail }
+    : p.data.media;
+}
+
 const heroPayload = reelHero
-  ? JSON.stringify({ ...reelHero.data.media, vertical: reelHero.data.vertical, alt: reelHero.data.title })
+  ? JSON.stringify({ ...toLightboxMedia(reelHero), vertical: reelHero.data.vertical, alt: reelHero.data.title })
   : null;
 ---
 
@@ -68,7 +75,7 @@ const heroPayload = reelHero
     {supporting.length > 0 && (
       <div class="reel-strip" data-reveal>
         {supporting.map((p) => {
-          const payload = JSON.stringify({ ...p.data.media, vertical: p.data.vertical, alt: p.data.title });
+          const payload = JSON.stringify({ ...toLightboxMedia(p), vertical: p.data.vertical, alt: p.data.title });
           return (
             <button class={`reel-chip${p.data.vertical ? ' vertical' : ''}`} data-media={payload} aria-label={`Play ${p.data.title}`}>
               <img src={p.data.thumbnail} alt={p.data.title} loading="lazy" decoding="async" />

@@ -186,6 +186,12 @@ const personJsonLd = {
         mobileMenu?.querySelectorAll('a').forEach((a) => {
           a.addEventListener('click', () => setMenu(false));
         });
+        // Esc closes the mobile menu (mirrors lightbox behaviour).
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && mobileMenu?.classList.contains('is-open')) {
+            setMenu(false);
+          }
+        });
 
         /* Scroll reveal ---------------------------------------------------- */
         const reveal = (el: Element) => el.classList.add('is-visible');

@@ -57,7 +57,9 @@ import { NAV, SITE } from '@/lib/site';
   .site-header {
     position: sticky;
     top: 0;
-    z-index: 60;
+    /* Must stay above the fullscreen .mobile-menu (z-index: 70) so the
+       hamburger-to-X toggle remains clickable when the menu is open. */
+    z-index: 80;
     background: color-mix(in oklab, var(--bg) 78%, transparent);
     backdrop-filter: blur(14px);
     -webkit-backdrop-filter: blur(14px);

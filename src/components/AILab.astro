@@ -67,7 +67,12 @@ const capabilities = [
     {aiProjects.length > 0 && (
       <div class="ailab-grid-cards">
         {aiProjects.map((p, i) => {
-          const payload = JSON.stringify({ ...p.data.media, vertical: p.data.vertical, alt: p.data.title });
+          // Lightbox only renders youtube/image/video — collapse gallery to its first frame.
+          const media =
+            p.data.media.type === 'gallery'
+              ? { type: 'image' as const, src: p.data.media.images[0]?.src ?? p.data.thumbnail }
+              : p.data.media;
+          const payload = JSON.stringify({ ...media, vertical: p.data.vertical, alt: p.data.title });
           return (
             <article
               class="ai-card"
