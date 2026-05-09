@@ -1,140 +1,244 @@
 ---
+/**
+ * AI Lab — dedicated section showing AI-augmented practice.
+ *
+ * Frames AI as a creative tool inside a real production pipeline,
+ * not a gimmick. Pulls AI-tagged projects from the content collection.
+ */
 import { getCollection } from 'astro:content';
 
-const aiProjects = (await getCollection('projects', ({ data }) => data.category === 'ai'))
+const all = await getCollection('projects');
+const aiProjects = all
+  .filter((p) => p.data.category === 'ai')
   .sort((a, b) => (b.data.order ?? 0) - (a.data.order ?? 0));
+
+const capabilities = [
+  { code: 'M1', title: 'Concept generation', body: 'Mood frames, references and worldbuilding from a creative brief.' },
+  { code: 'M2', title: 'Image / video synthesis', body: 'Cinematic frames, vertical clips and storyboards via Midjourney, Runway and ComfyUI.' },
+  { code: 'M3', title: 'Pipeline automation', body: 'Custom workflows that route prompts → renders → post in a single chain.' },
+  { code: 'M4', title: 'Editorial direction', body: 'Taste-led curation so AI-assisted output still feels human and on-brand.' },
+];
 ---
 
-<section
-  id="ai-lab"
-  class="relative py-24 sm:py-36 overflow-hidden bg-ink text-cream"
->
-  <div
-    aria-hidden="true"
-    class="pointer-events-none absolute -top-[15vmin] right-[10vmin] h-[55vmin] w-[55vmin] rounded-full bg-blue/55 blur-[160px] opacity-50"
-  ></div>
-  <div
-    aria-hidden="true"
-    class="pointer-events-none absolute bottom-[10vmin] -left-[15vmin] h-[55vmin] w-[55vmin] rounded-full bg-coral/40 blur-[160px] opacity-40"
-  ></div>
+<section id="ai-lab" class="ailab">
+  <div class="ailab-canvas" aria-hidden="true">
+    <div class="ailab-grid"></div>
+    <div class="ailab-glow"></div>
+  </div>
 
-  <div class="relative max-w-7xl mx-auto px-6 sm:px-10">
-    <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14">
-      <div>
-        <p class="font-mono text-xs tracking-[0.3em] text-cream/55" data-reveal>
-          // 03 · AI LAB
-        </p>
-        <h2
-          class="mt-5 font-display leading-[0.95] tracking-tight text-balance"
-          style="font-size: clamp(2.4rem, 7vw, 6.5rem);"
-          data-reveal
-        >
-          Generative tools, used like
-          <em class="not-italic text-coral">a film crew</em>.
-        </h2>
-      </div>
-      <p class="max-w-md text-cream/70 text-pretty" data-reveal>
-        AI doesn't replace taste — it amplifies it. These are workflows where
-        models, prompt design and traditional craft work together.
+  <div class="wrap-wide ailab-inner">
+    <header class="ailab-head">
+      <span class="eyebrow" data-reveal>AI · Creative Technology</span>
+      <h2 class="ailab-title text-balance" data-reveal style="--reveal-delay: 80ms;">
+        AI as a <em>creative partner</em>, not a shortcut.
+      </h2>
+      <p class="ailab-lede" data-reveal style="--reveal-delay: 160ms;">
+        I build production pipelines that pair generative tools with strong creative
+        direction — preserving taste, accelerating ideation, and unlocking visual
+        ideas that wouldn't be feasible by hand.
       </p>
-    </div>
+    </header>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-      {aiProjects.map((project, i) => {
-        const number = String(i + 1).padStart(2, '0');
-        const m = project.data.media;
-        const lbType: 'youtube' | 'image' | 'video' =
-          m.type === 'youtube' || m.type === 'video' ? m.type : 'image';
-        const lbSrc =
-          m.type === 'gallery'
-            ? (m.images[0]?.src ?? project.data.thumbnail)
-            : m.src;
-        const payload = JSON.stringify({
-          type: lbType,
-          src: lbSrc,
-          title: project.data.title,
-          category: 'AI Lab',
-          vertical: project.data.vertical ?? false,
-        });
-
-        return (
-          <article
-            data-reveal
-            class="group relative overflow-hidden rounded-3xl border border-cream/10 bg-paper/[0.04] backdrop-blur-sm p-6 sm:p-8 hover:border-cream/25 transition-colors"
-          >
-            <div class="flex items-start justify-between mb-6">
-              <span class="font-mono text-xs tracking-[0.25em] text-cream/55">
-                {number}
-              </span>
-              <div class="flex flex-wrap gap-2 justify-end">
-                {project.data.tags.slice(0, 3).map((tag) => (
-                  <span class="font-mono text-[10px] tracking-[0.18em] uppercase border border-cream/20 rounded-full px-2.5 py-1 text-cream/80">
-                    {tag}
-                  </span>
-                ))}
-              </div>
+    <div class="ailab-cols">
+      <ul class="ailab-caps" role="list">
+        {capabilities.map((c, i) => (
+          <li class="ai-cap" data-reveal style={`--reveal-delay: ${i * 70}ms;`}>
+            <span class="ai-cap-code">{c.code}</span>
+            <div>
+              <h3 class="ai-cap-title">{c.title}</h3>
+              <p class="ai-cap-body">{c.body}</p>
             </div>
+          </li>
+        ))}
+      </ul>
 
-            <h3 class="font-display text-2xl sm:text-3xl leading-tight">
-              {project.data.title}
-            </h3>
-            {project.data.tagline && (
-              <p class="mt-3 text-cream/70 text-sm sm:text-base">
-                {project.data.tagline}
-              </p>
-            )}
-
-            <button
-              type="button"
-              class="relative mt-7 block w-full rounded-2xl overflow-hidden bg-ink"
-              data-cursor-play
-              data-lightbox={payload}
-              aria-label={`Play ${project.data.title}`}
-            >
-              <div class="aspect-video relative">
-                <img
-                  src={project.data.thumbnail}
-                  alt={project.data.title}
-                  crossorigin="anonymous"
-                  class="thumb absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
-                  loading="lazy"
-                  decoding="async"
-                />
-                <span
-                  aria-hidden="true"
-                  class="thumb-fallback absolute inset-0 hidden bg-gradient-to-br from-blue via-coral/60 to-ink"
-                ></span>
-                <div class="absolute inset-0 bg-gradient-to-tr from-ink/60 via-transparent to-blue/30"></div>
-
-                <span aria-hidden="true" class="absolute inset-0 flex items-center justify-center">
-                  <span class="inline-flex items-center justify-center w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-cream text-ink shadow-xl group-hover:bg-coral group-hover:text-cream transition-colors">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M8 5v14l11-7-11-7z" />
-                    </svg>
-                  </span>
-                </span>
-
-                <span class="absolute top-3 left-3 inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-cream/95 text-ink font-mono text-[10px] tracking-[0.2em] uppercase">
-                  <span class="w-1.5 h-1.5 rounded-full bg-coral animate-pulse"></span>
-                  AI Workflow
-                </span>
-              </div>
-            </button>
-          </article>
-        );
-      })}
+      <div class="ailab-prompt" data-reveal>
+        <span class="ai-pl">/PROMPT</span>
+        <p class="ai-pt">
+          "A cinematic 9:16 frame of a desert filmmaker at golden hour, shot on Arri,
+          warm grade, soft grain, 35mm, the rotating word <em>Vision · Intelligence ·
+          Motion · Impact</em> projected on the dune."
+        </p>
+        <span class="ai-pl">/SYS</span>
+        <p class="ai-pb">RUNWAY GEN-3 · COMFYUI · CUSTOM EDIT PASS</p>
+      </div>
     </div>
+
+    {aiProjects.length > 0 && (
+      <div class="ailab-grid-cards">
+        {aiProjects.map((p, i) => {
+          const payload = JSON.stringify({ ...p.data.media, vertical: p.data.vertical, alt: p.data.title });
+          return (
+            <article
+              class="ai-card"
+              data-media={payload}
+              data-reveal
+              style={`--reveal-delay: ${i * 80}ms;`}
+              tabindex="0"
+              role="button"
+              aria-label={`Play ${p.data.title}`}
+            >
+              <div class="ai-card-thumb">
+                <img src={p.data.thumbnail} alt={p.data.title} loading="lazy" decoding="async" />
+                <span class="ai-card-play"><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span>
+              </div>
+              <div class="ai-card-meta">
+                <span class="ai-card-num">{String(i + 1).padStart(2, '0')}</span>
+                <h3 class="ai-card-title">{p.data.title}</h3>
+                {p.data.tagline && <p class="ai-card-blurb">{p.data.tagline}</p>}
+              </div>
+            </article>
+          );
+        })}
+      </div>
+    )}
   </div>
 </section>
 
-<script>
-  document.querySelectorAll<HTMLElement>('#ai-lab [data-lightbox]').forEach((btn) => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      try {
-        const payload = JSON.parse(btn.getAttribute('data-lightbox') ?? '{}');
-        window.dispatchEvent(new CustomEvent('lightbox:open', { detail: payload }));
-      } catch {}
-    });
-  });
-</script>
+<style>
+  .ailab {
+    position: relative;
+    padding-block: clamp(5rem, 12vw, 8rem);
+    overflow: hidden;
+    background: var(--bg);
+    border-block: 1px solid var(--line);
+  }
+  .ailab-canvas {
+    position: absolute; inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .ailab-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size: 64px 64px;
+    -webkit-mask-image: radial-gradient(ellipse at 70% 30%, black 0%, transparent 70%);
+            mask-image: radial-gradient(ellipse at 70% 30%, black 0%, transparent 70%);
+  }
+  .ailab-glow {
+    position: absolute; inset: -10%;
+    background:
+      radial-gradient(ellipse at 80% 20%, color-mix(in oklab, var(--accent-2) 22%, transparent), transparent 55%),
+      radial-gradient(ellipse at 10% 80%, color-mix(in oklab, var(--accent) 18%, transparent), transparent 60%);
+    filter: blur(60px);
+    animation: drift 22s var(--ease-out-expo) infinite alternate;
+  }
+  .ailab-inner { position: relative; z-index: 1; }
+
+  .ailab-head { max-width: 60rem; display: flex; flex-direction: column; gap: 1rem; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+  .ailab-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .ailab-title em { font-style: italic; color: var(--accent-2); }
+  .ailab-lede { color: var(--fg-soft); max-width: 56ch; line-height: 1.6; }
+
+  .ailab-cols {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  }
+  @media (min-width: 980px) { .ailab-cols { grid-template-columns: 1.2fr 1fr; gap: 3rem; } }
+
+  .ailab-caps { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1rem; }
+  .ai-cap {
+    display: grid;
+    grid-template-columns: 36px 1fr;
+    gap: 1rem;
+    padding: 1.1rem 1.2rem;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--bg-elev);
+  }
+  .ai-cap-code {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    color: var(--accent-2);
+    border: 1px solid var(--accent-2);
+    border-radius: 6px;
+    padding: 0.3rem 0.4rem;
+    align-self: start;
+    height: fit-content;
+  }
+  .ai-cap-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    margin: 0 0 0.25rem;
+  }
+  .ai-cap-body { color: var(--fg-soft); font-size: 0.92rem; line-height: 1.55; }
+
+  .ailab-prompt {
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    padding: 1.4rem 1.4rem 1.5rem;
+    background: var(--bg-elev);
+    display: flex; flex-direction: column; gap: 0.6rem;
+    font-family: var(--font-mono);
+    box-shadow: 0 10px 30px -20px color-mix(in oklab, var(--accent-2) 40%, transparent);
+  }
+  .ai-pl { font-size: 0.65rem; letter-spacing: 0.18em; color: var(--accent-2); }
+  .ai-pt {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.1rem;
+    line-height: 1.45;
+    color: var(--fg);
+  }
+  .ai-pt em { color: var(--accent); font-style: italic; }
+  .ai-pb { font-size: 0.7rem; color: var(--mute); letter-spacing: 0.12em; }
+
+  .ailab-grid-cards {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.2rem;
+  }
+  @media (min-width: 700px) { .ailab-grid-cards { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1100px) { .ailab-grid-cards { grid-template-columns: repeat(4, 1fr); } }
+
+  .ai-card {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    background: var(--bg-elev);
+    cursor: pointer;
+    transition: transform 0.5s var(--ease-out-expo), border-color 0.4s ease, box-shadow 0.4s ease;
+    text-align: left;
+  }
+  .ai-card:hover { transform: translateY(-4px); border-color: var(--accent-2); box-shadow: 0 30px 60px -30px color-mix(in oklab, var(--accent-2) 40%, transparent); }
+  .ai-card-thumb {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    background: var(--bg);
+    overflow: hidden;
+  }
+  .ai-card-thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s var(--ease-out-expo); }
+  .ai-card:hover .ai-card-thumb img { transform: scale(1.06); }
+  .ai-card-play {
+    position: absolute; bottom: 12px; right: 12px;
+    width: 36px; height: 36px;
+    display: grid; place-items: center;
+    background: var(--accent-2); color: #fff;
+    border-radius: 999px;
+  }
+  .ai-card-meta { padding: 1rem 1.1rem 1.2rem; display: flex; flex-direction: column; gap: 0.35rem; }
+  .ai-card-num {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    color: var(--mute);
+  }
+  .ai-card-title {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    margin: 0;
+  }
+  .ai-card-blurb { color: var(--fg-soft); font-size: 0.88rem; line-height: 1.5; }
+</style>

@@ -1,33 +1,46 @@
 ---
-const items = [
-  'Filmmaker',
-  '★',
-  'Visual Designer',
-  '★',
-  'Motion Designer',
-  '★',
-  'AI Specialist',
-  '★',
-  'Full-Stack Designer',
-  '★',
-  'Storyteller',
-  '★',
-];
+/**
+ * Endless-scrolling credits strip — adds energy without screen weight.
+ */
+import { MARQUEE } from '@/lib/site';
+const items = [...MARQUEE, ...MARQUEE];
 ---
 
-<section
-  aria-hidden="true"
-  class="relative py-12 sm:py-16 border-y border-ink/10 bg-paper overflow-hidden"
->
+<section class="marquee-section" aria-hidden="true">
   <div class="ticker-mask">
-    <div class="marquee-track flex w-max items-center gap-8 sm:gap-12 px-6">
-      {[...items, ...items].map((item) => (
-        <span
-          class="font-display text-[clamp(2.6rem,8vw,7rem)] leading-none tracking-tight whitespace-nowrap text-ink-soft hover:text-coral transition-colors"
-        >
-          {item === '★' ? <span class="text-coral inline-block align-middle">●</span> : item}
+    <div class="marquee-track">
+      {items.map((label) => (
+        <span class="m-item">
+          <span>{label}</span>
+          <span class="m-dot">✦</span>
         </span>
       ))}
     </div>
   </div>
 </section>
+
+<style>
+  .marquee-section {
+    padding-block: 1.2rem;
+    border-block: 1px solid var(--line);
+    background: var(--bg-elev);
+    overflow: hidden;
+  }
+  .marquee-track {
+    display: inline-flex;
+    gap: 2.4rem;
+    white-space: nowrap;
+    will-change: transform;
+  }
+  .m-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 2.4rem;
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: clamp(1.4rem, 3vw, 2.4rem);
+    color: var(--fg);
+    font-weight: 400;
+  }
+  .m-dot { color: var(--accent); }
+</style>

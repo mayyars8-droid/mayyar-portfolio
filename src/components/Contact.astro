@@ -1,0 +1,202 @@
+---
+/**
+ * Contact CTA + form.
+ *
+ * The form posts via mailto by default — clear placeholder for swapping
+ * to Formspree / a serverless endpoint. No backend required to ship.
+ */
+import { SITE } from '@/lib/site';
+---
+
+<section id="contact" class="contact grain">
+  <div class="atmosphere" aria-hidden="true"></div>
+  <div class="wrap contact-inner">
+    <div class="contact-copy">
+      <span class="eyebrow" data-reveal>Contact · Let's build</span>
+      <h2 class="contact-title text-balance" data-reveal style="--reveal-delay: 80ms;">
+        Let's build something <em>visual</em>,
+        <em>intelligent</em> and <em>cinematic</em>.
+      </h2>
+      <p class="contact-lede" data-reveal style="--reveal-delay: 160ms;">
+        I take on a small number of projects every quarter — film, brand, AI content,
+        editing. If you have an idea, a brief or just an instinct, drop me a note.
+        I'll come back within 24 hours.
+      </p>
+
+      <ul class="contact-list" data-reveal style="--reveal-delay: 240ms;">
+        <li>
+          <span class="cl-key">Email</span>
+          <a href={`mailto:${SITE.email}`} class="cl-val">{SITE.email}</a>
+        </li>
+        <li>
+          <span class="cl-key">WhatsApp</span>
+          <a href={SITE.social.whatsapp} target="_blank" rel="noopener" class="cl-val">+962 798 455 697</a>
+        </li>
+        <li>
+          <span class="cl-key">LinkedIn</span>
+          <a href={SITE.social.linkedin} target="_blank" rel="noopener" class="cl-val">linkedin.com/in/mayyarz</a>
+        </li>
+        <li>
+          <span class="cl-key">Linktree</span>
+          <a href={SITE.social.linktree} target="_blank" rel="noopener" class="cl-val">linktr.ee/mayyar</a>
+        </li>
+        <li>
+          <span class="cl-key">Location</span>
+          <span class="cl-val">{SITE.location} · Working worldwide</span>
+        </li>
+      </ul>
+    </div>
+
+    <form
+      id="contact-form"
+      class="contact-form card"
+      action={`mailto:${SITE.email}`}
+      method="post"
+      enctype="text/plain"
+      data-reveal
+      style="--reveal-delay: 200ms;"
+      novalidate
+    >
+      <div class="cf-row">
+        <label class="cf-field">
+          <span>Name</span>
+          <input type="text" name="name" required autocomplete="name" placeholder="Your name" />
+        </label>
+        <label class="cf-field">
+          <span>Email</span>
+          <input type="email" name="email" required autocomplete="email" placeholder="you@studio.com" />
+        </label>
+      </div>
+
+      <label class="cf-field">
+        <span>Project type</span>
+        <select name="project">
+          <option>Visual Design</option>
+          <option>AI Creative Direction</option>
+          <option>Filmmaking</option>
+          <option>Video Editing &amp; Motion</option>
+          <option>Other</option>
+        </select>
+      </label>
+
+      <label class="cf-field">
+        <span>Tell me about it</span>
+        <textarea name="message" rows="5" required placeholder="Brief, references, deadline, budget if known…"></textarea>
+      </label>
+
+      <div class="cf-actions">
+        <button type="submit" class="btn btn-primary">
+          Send brief
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m5 12 14 0M13 5l7 7-7 7"/></svg>
+        </button>
+        <span class="cf-note">Or email <a href={`mailto:${SITE.email}`}>{SITE.email}</a> directly.</span>
+      </div>
+
+      <!--
+        REPLACE WITH FORMSPREE OR A CUSTOM ENDPOINT:
+        action="https://formspree.io/f/your-form-id"
+        method="POST"
+        enctype="application/x-www-form-urlencoded"
+        Then remove the encoding hack used for mailto: above.
+      -->
+    </form>
+  </div>
+</section>
+
+<style>
+  .contact {
+    position: relative;
+    padding-block: clamp(5rem, 12vw, 8rem);
+    background: var(--bg-elev);
+    border-top: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .contact-inner {
+    position: relative; z-index: 2;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2.5rem, 6vw, 4rem);
+    align-items: start;
+  }
+  @media (min-width: 980px) { .contact-inner { grid-template-columns: 1fr 1fr; } }
+
+  .contact-copy { display: flex; flex-direction: column; gap: 1.2rem; }
+  .contact-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.04;
+  }
+  .contact-title em { font-style: italic; color: var(--accent); }
+  .contact-lede { color: var(--fg-soft); max-width: 50ch; line-height: 1.6; }
+
+  .contact-list {
+    list-style: none; margin: 0.5rem 0 0; padding: 0;
+    display: flex; flex-direction: column;
+  }
+  .contact-list li {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 1rem;
+    padding-block: 0.7rem;
+    border-top: 1px solid var(--line);
+    align-items: baseline;
+  }
+  .contact-list li:last-child { border-bottom: 1px solid var(--line); }
+  .cl-key {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .cl-val { color: var(--fg); transition: color 0.3s ease; }
+  a.cl-val:hover { color: var(--accent); }
+
+  .contact-form {
+    padding: 1.6rem 1.6rem 1.4rem;
+    display: flex; flex-direction: column; gap: 1rem;
+  }
+  .cf-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  @media (min-width: 700px) { .cf-row { grid-template-columns: 1fr 1fr; } }
+
+  .cf-field { display: flex; flex-direction: column; gap: 0.4rem; }
+  .cf-field span {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+  .cf-field input,
+  .cf-field select,
+  .cf-field textarea {
+    width: 100%;
+    padding: 0.85rem 1rem;
+    background: var(--bg);
+    border: 1px solid var(--line-strong);
+    border-radius: 10px;
+    color: var(--fg);
+    font: inherit;
+    transition: border-color 0.3s ease, background 0.3s ease;
+  }
+  .cf-field textarea { resize: vertical; min-height: 120px; }
+  .cf-field input:focus,
+  .cf-field select:focus,
+  .cf-field textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+
+  .cf-actions {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem;
+  }
+  .cf-note { font-size: 0.85rem; color: var(--mute); }
+  .cf-note a { color: var(--accent); }
+</style>

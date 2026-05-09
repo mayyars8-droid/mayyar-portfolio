@@ -1,0 +1,238 @@
+---
+/**
+ * Cinematic reel section.
+ *
+ * Pulls one featured editing/motion piece as the showreel hero,
+ * and rotates a horizontally-scrollable strip of supporting work
+ * underneath. Lazy-loaded — no autoplay heavy media.
+ */
+import { getCollection } from 'astro:content';
+
+const all = await getCollection('projects');
+
+// Hero reel: prefer the editing reel if available
+const reelHero =
+  all.find((p) => p.id.includes('motion-reel')) ||
+  all.find((p) => p.id.includes('edit-reel')) ||
+  all.filter((p) => p.data.featured && (p.data.category === 'film' || p.data.category === 'motion'))[0];
+
+const supporting = all
+  .filter((p) => (p.data.category === 'film' || p.data.category === 'motion' || p.data.category === 'editing') && p.id !== reelHero?.id)
+  .sort((a, b) => (b.data.order ?? 0) - (a.data.order ?? 0))
+  .slice(0, 8);
+
+const heroPayload = reelHero
+  ? JSON.stringify({ ...reelHero.data.media, vertical: reelHero.data.vertical, alt: reelHero.data.title })
+  : null;
+---
+
+<section id="reel" class="reel grain">
+  <div class="atmosphere" aria-hidden="true"></div>
+  <div class="wrap-wide">
+    <header class="reel-head">
+      <span class="eyebrow" data-reveal>Showreel · 2024 / 2025</span>
+      <h2 class="reel-title text-balance" data-reveal style="--reveal-delay: 80ms;">
+        Sit back. Hit play. Watch a frame of the work.
+      </h2>
+    </header>
+
+    {reelHero && heroPayload && (
+      <div
+        class="reel-stage"
+        data-media={heroPayload}
+        data-reveal-clip
+        tabindex="0"
+        role="button"
+        aria-label={`Play showreel: ${reelHero.data.title}`}
+      >
+        <img
+          src={reelHero.data.thumbnail}
+          alt={`Cover frame of ${reelHero.data.title}`}
+          loading="lazy"
+          decoding="async"
+          width="1600"
+          height="900"
+        />
+        <div class="reel-frame-tag">CH 01 · {reelHero.data.title.toUpperCase()}</div>
+        <div class="reel-time">02:48</div>
+        <div class="reel-play">
+          <span class="reel-play-ring"></span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+        </div>
+        <div class="reel-bars" aria-hidden="true">
+          <span></span><span></span>
+        </div>
+      </div>
+    )}
+
+    {supporting.length > 0 && (
+      <div class="reel-strip" data-reveal>
+        {supporting.map((p) => {
+          const payload = JSON.stringify({ ...p.data.media, vertical: p.data.vertical, alt: p.data.title });
+          return (
+            <button class={`reel-chip${p.data.vertical ? ' vertical' : ''}`} data-media={payload} aria-label={`Play ${p.data.title}`}>
+              <img src={p.data.thumbnail} alt={p.data.title} loading="lazy" decoding="async" />
+              <span class="rc-meta">
+                <span class="rc-title">{p.data.title}</span>
+                <span class="rc-cat">{p.data.category}</span>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    )}
+
+    {!reelHero && (
+      <div class="reel-empty" data-reveal>
+        <p>Showreel coming soon. Add your reel via <code>src/content/projects/</code>.</p>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .reel {
+    position: relative;
+    padding-block: clamp(5rem, 12vw, 8rem);
+    background: var(--bg-elev);
+    border-block: 1px solid var(--line);
+  }
+  .reel-head {
+    max-width: 60rem; margin-bottom: clamp(2.5rem, 5vw, 3.5rem);
+    display: flex; flex-direction: column; gap: 1rem;
+  }
+  .reel-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .reel-stage {
+    position: relative;
+    aspect-ratio: 16 / 9;
+    border-radius: 18px;
+    overflow: hidden;
+    cursor: pointer;
+    background: #000;
+    box-shadow: 0 40px 100px -40px rgba(0,0,0,0.55);
+    transition: transform 0.6s var(--ease-out-expo);
+  }
+  .reel-stage:hover { transform: translateY(-4px); }
+  .reel-stage img {
+    width: 100%; height: 100%; object-fit: cover;
+    transition: transform 1s var(--ease-out-expo), filter 0.6s ease;
+    filter: saturate(1.05) contrast(1.05);
+  }
+  .reel-stage:hover img { transform: scale(1.04); filter: saturate(1.1) contrast(1.08); }
+
+  .reel-frame-tag, .reel-time {
+    position: absolute;
+    top: 18px;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    color: rgba(255,255,255,0.85);
+    background: rgba(0,0,0,0.55);
+    padding: 0.35rem 0.6rem;
+    border-radius: 4px;
+    backdrop-filter: blur(8px);
+  }
+  .reel-frame-tag { left: 18px; }
+  .reel-time { right: 18px; }
+
+  .reel-play {
+    position: absolute;
+    inset: 0;
+    display: grid; place-items: center;
+    color: #fff;
+  }
+  .reel-play-ring {
+    position: absolute;
+    width: 96px; height: 96px;
+    border-radius: 999px;
+    border: 1px solid rgba(255,255,255,0.5);
+    animation: pulseRing 2.4s var(--ease-out-expo) infinite;
+  }
+  @keyframes pulseRing {
+    0% { transform: scale(1); opacity: 0.7; }
+    100% { transform: scale(1.7); opacity: 0; }
+  }
+  .reel-play svg {
+    position: relative;
+    width: 60px; height: 60px;
+    padding: 18px;
+    background: var(--accent);
+    border-radius: 999px;
+    z-index: 2;
+    box-shadow: 0 10px 40px rgba(255, 95, 31, 0.5);
+  }
+
+  .reel-bars {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+  .reel-bars span {
+    position: absolute; left: 0; right: 0;
+    height: 80px;
+    background: rgba(0,0,0,0.55);
+    transform: translateY(0);
+    transition: transform 0.7s var(--ease-out-expo);
+  }
+  .reel-bars span:first-child { top: 0; transform: translateY(-100%); }
+  .reel-bars span:last-child { bottom: 0; transform: translateY(100%); }
+  .reel-stage:hover .reel-bars span:first-child { transform: translateY(0); }
+  .reel-stage:hover .reel-bars span:last-child { transform: translateY(0); }
+
+  .reel-strip {
+    margin-top: 1.4rem;
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 220px;
+    gap: 1rem;
+    overflow-x: auto;
+    padding-block: 0.5rem;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+  }
+  .reel-strip::-webkit-scrollbar { height: 4px; }
+  .reel-strip::-webkit-scrollbar-thumb { background: var(--line-strong); border-radius: 999px; }
+
+  .reel-chip {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 9;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    scroll-snap-align: start;
+    transition: transform 0.4s var(--ease-out-expo);
+    padding: 0;
+  }
+  .reel-chip.vertical { aspect-ratio: 9 / 16; }
+  .reel-chip:hover { transform: translateY(-4px); }
+  .reel-chip img { width: 100%; height: 100%; object-fit: cover; }
+  .rc-meta {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 0.6rem 0.7rem;
+    display: flex; flex-direction: column; gap: 0.15rem;
+    background: linear-gradient(180deg, transparent, rgba(0,0,0,0.85));
+    text-align: left;
+    color: #fff;
+  }
+  .rc-title { font-size: 0.85rem; font-weight: 500; }
+  .rc-cat { font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.8; }
+
+  .reel-empty {
+    text-align: center;
+    padding: 4rem 2rem;
+    border: 1px dashed var(--line-strong);
+    border-radius: 18px;
+    color: var(--mute);
+  }
+  .reel-empty code { font-family: var(--font-mono); color: var(--accent); }
+</style>

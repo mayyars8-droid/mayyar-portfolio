@@ -1,0 +1,73 @@
+---
+/**
+ * Why work with me — replaces classic testimonials with truthful
+ * strengths drawn from the CV.
+ */
+import { WHY } from '@/lib/site';
+---
+
+<section class="whyme">
+  <div class="wrap">
+    <header class="why-head">
+      <span class="eyebrow" data-reveal>Why work with me</span>
+      <h2 class="why-title text-balance" data-reveal style="--reveal-delay: 80ms;">
+        Six reasons brands keep coming back.
+      </h2>
+    </header>
+    <ul class="why-grid" role="list">
+      {WHY.map((w, i) => (
+        <li class="why-card" data-reveal style={`--reveal-delay: ${i * 70}ms;`}>
+          <span class="why-num">{String(i + 1).padStart(2, '0')}</span>
+          <h3 class="why-card-title">{w.title}</h3>
+          <p class="why-card-body">{w.body}</p>
+        </li>
+      ))}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .whyme {
+    padding-block: clamp(5rem, 12vw, 8rem);
+    background: var(--bg);
+  }
+  .why-head { max-width: 60rem; margin-bottom: clamp(2.5rem, 5vw, 3.5rem); display: flex; flex-direction: column; gap: 1rem; }
+  .why-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .why-grid {
+    list-style: none; margin: 0; padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  @media (min-width: 760px) { .why-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (min-width: 1100px) { .why-grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .why-card {
+    padding: 1.6rem 1.5rem;
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    background: var(--bg-elev);
+    transition: transform 0.4s var(--ease-out-expo), border-color 0.3s ease;
+  }
+  .why-card:hover { transform: translateY(-3px); border-color: var(--line-strong); }
+  .why-num {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.7rem;
+  }
+  .why-card-title {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    margin: 0 0 0.5rem;
+  }
+  .why-card-body { color: var(--fg-soft); font-size: 0.94rem; line-height: 1.55; }
+</style>

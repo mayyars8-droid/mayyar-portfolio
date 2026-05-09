@@ -1,84 +1,84 @@
 ---
-const steps = [
-  {
-    number: '01',
-    title: 'Direction',
-    body: 'Brief, references, mood. We agree on the story before a single pixel is committed.',
-  },
-  {
-    number: '02',
-    title: 'Production',
-    body: 'Pre-pro, shoot, design system, illustration — built with intent, not by accident.',
-  },
-  {
-    number: '03',
-    title: 'Edit & Motion',
-    body: 'The cut is where the story really gets written. Pacing, sound, kinetic type, colour.',
-  },
-  {
-    number: '04',
-    title: 'AI-assist',
-    body: 'Generative tools accelerate iteration: variations, mockups, clean-up, ideation — never the final word.',
-  },
-  {
-    number: '05',
-    title: 'Ship',
-    body: 'Master files, social cut-downs, export specs and a tidy delivery — ready for the feed.',
-  },
-];
+/**
+ * Process — 5-step creative workflow.
+ * Designed as a horizontal timeline that reflows vertical on small screens.
+ */
+import { PROCESS } from '@/lib/site';
 ---
 
-<section id="process" class="relative py-24 sm:py-36 bg-cream-2/60 overflow-hidden grain">
-  <div class="max-w-7xl mx-auto px-6 sm:px-10">
-    <div class="grid grid-cols-1 md:grid-cols-12 gap-10">
-      <div class="md:col-span-4 md:sticky md:top-32 self-start">
-        <p class="font-mono text-xs tracking-[0.3em] text-ink-soft" data-reveal>
-          // 04 · PROCESS
-        </p>
-        <h2
-          class="mt-5 font-display leading-[0.95] tracking-tight text-balance"
-          style="font-size: clamp(2.2rem, 5.5vw, 4.5rem);"
-          data-reveal
-        >
-          From <em class="not-italic text-coral">brief</em> to broadcast.
-        </h2>
-        <p class="mt-6 max-w-sm text-ink-soft text-pretty" data-reveal>
-          A simple, story-first pipeline that scales from a thirty-second social
-          cut to a multi-week brand campaign.
-        </p>
-      </div>
+<section id="process" class="process">
+  <div class="wrap">
+    <header class="process-head">
+      <span class="eyebrow" data-reveal>How we work · Process</span>
+      <h2 class="process-title text-balance" data-reveal style="--reveal-delay: 80ms;">
+        Strategy first. <em>Cinema</em> second. Delivery, always on time.
+      </h2>
+      <p class="process-lede" data-reveal style="--reveal-delay: 160ms;">
+        A simple flow that scales from a one-week social cut to a three-month
+        campaign. Built for clarity, momentum and creative quality.
+      </p>
+    </header>
 
-      <ol class="md:col-span-8 relative space-y-3 sm:space-y-4">
-        {steps.map((step, i) => (
-          <li
-            data-reveal
-            style={`--reveal-delay:${i * 60}ms`}
-            class="group relative bg-paper border border-ink/10 rounded-3xl p-6 sm:p-8 hover:border-ink/30 transition-colors"
-          >
-            <div class="flex items-baseline justify-between gap-6">
-              <div class="flex items-baseline gap-5 sm:gap-7">
-                <span class="font-mono text-xs tracking-[0.2em] text-coral">
-                  {step.number}
-                </span>
-                <h3 class="font-display text-2xl sm:text-3xl leading-tight">
-                  {step.title}
-                </h3>
-              </div>
-              <span
-                aria-hidden="true"
-                class="hidden sm:inline-block w-8 h-8 rounded-full border border-ink/15 grid place-items-center group-hover:bg-ink group-hover:text-cream group-hover:border-ink transition-colors"
-              >
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 6l6 6-6 6" />
-                </svg>
-              </span>
-            </div>
-            <p class="mt-3 ml-0 sm:ml-12 max-w-2xl text-ink-soft text-pretty">
-              {step.body}
-            </p>
-          </li>
-        ))}
-      </ol>
-    </div>
+    <ol class="process-row" role="list">
+      {PROCESS.map((p, i) => (
+        <li class="step" data-reveal style={`--reveal-delay: ${i * 90}ms;`}>
+          <div class="step-head">
+            <span class="step-code">{p.code}</span>
+            <span class="step-line" aria-hidden="true"></span>
+          </div>
+          <h3 class="step-name">{p.name}</h3>
+          <p class="step-blurb">{p.blurb}</p>
+        </li>
+      ))}
+    </ol>
   </div>
 </section>
+
+<style>
+  .process {
+    padding-block: clamp(5rem, 12vw, 8rem);
+    background: var(--bg-elev);
+    border-block: 1px solid var(--line);
+  }
+  .process-head { max-width: 60rem; margin-bottom: clamp(2.5rem, 5vw, 4rem); display: flex; flex-direction: column; gap: 1rem; }
+  .process-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .process-title em { font-style: italic; color: var(--accent); }
+  .process-lede { color: var(--fg-soft); max-width: 56ch; line-height: 1.6; }
+
+  .process-row {
+    list-style: none; margin: 0; padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.4rem;
+  }
+  @media (min-width: 760px) { .process-row { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1rem; } }
+
+  .step { display: flex; flex-direction: column; gap: 0.6rem; padding-top: 0.4rem; }
+  .step-head {
+    display: flex; align-items: center; gap: 0.6rem;
+    padding-bottom: 0.7rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .step-code {
+    width: 30px; height: 30px;
+    display: grid; place-items: center;
+    border: 1px solid var(--accent);
+    color: var(--accent);
+    border-radius: 999px;
+    font-family: var(--font-mono); font-size: 0.7rem;
+  }
+  .step-line { flex: 1; height: 1px; background: var(--line); }
+
+  .step-name {
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 1.8vw, 1.4rem);
+    margin: 0;
+  }
+  .step-blurb { color: var(--fg-soft); font-size: 0.92rem; line-height: 1.55; }
+</style>

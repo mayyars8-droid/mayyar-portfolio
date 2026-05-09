@@ -1,181 +1,124 @@
 ---
+/**
+ * Featured Work — filterable project grid.
+ *
+ * Pulls from the `projects` content collection. Excludes the AI category
+ * here because it has its own dedicated AI Lab section below.
+ */
 import { getCollection } from 'astro:content';
+import ProjectCard from '@/components/ProjectCard.astro';
 import { CATEGORIES } from '@/lib/site';
-import ProjectCard from './ProjectCard.astro';
 
 const all = await getCollection('projects');
-// Filter out AI projects from the main grid (they get their own dedicated section)
-// and split design from video-led work for richer layouts.
 const projects = all
   .filter((p) => p.data.category !== 'ai')
   .sort((a, b) => (b.data.order ?? 0) - (a.data.order ?? 0));
 
-const filterableCategories = CATEGORIES.filter((c) => c.id !== 'ai');
+// Categories visible in the work tab bar (AI excluded; it has its own section).
+const visibleCats = CATEGORIES.filter((c) => c.id !== 'ai');
 ---
 
-<section id="work" class="relative py-24 sm:py-36 overflow-hidden">
-  <div class="max-w-7xl mx-auto px-6 sm:px-10">
-    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-12">
-      <div>
-        <p class="font-mono text-xs tracking-[0.3em] text-ink-soft" data-reveal>
-          // 02 · SELECTED WORK
-        </p>
-        <h2
-          class="mt-5 font-display leading-[0.95] tracking-tight text-balance"
-          style="font-size: clamp(2.4rem, 7vw, 6.5rem);"
-          data-reveal
-        >
-          A reel of <em class="not-italic text-coral">moving pictures</em>,
-          <br />and the design that makes them sing.
-        </h2>
-      </div>
-      <p class="max-w-md text-ink-soft text-pretty" data-reveal>
-        Filter by discipline. Each project opens in a fullscreen viewer.
-        The full library lives in a content folder — adding new work is a
-        one-file commit.
+<section id="work" class="work">
+  <div class="wrap-wide">
+    <header class="work-head">
+      <span class="eyebrow" data-reveal>Featured work · Selected case frames</span>
+      <h2 class="work-title text-balance" data-reveal style="--reveal-delay: 80ms;">
+        A reel of stories — film, motion, design and content.
+      </h2>
+      <p class="work-lede" data-reveal style="--reveal-delay: 160ms;">
+        Tap any card to open the full piece. Each project is curated and presented
+        as a small frame from a wider creative practice.
       </p>
+    </header>
+
+    <div class="work-controls" data-reveal>
+      <div class="tabs" role="tablist" aria-label="Filter work">
+        <button class="tab" role="tab" data-filter="all" aria-selected="true">All</button>
+        {visibleCats.map((c) => (
+          <button class="tab" role="tab" data-filter={c.id} aria-selected="false">{c.label}</button>
+        ))}
+      </div>
+      <p class="work-count" id="work-count">{projects.length} projects</p>
     </div>
 
-    <div
-      class="flex flex-wrap items-center gap-2 mb-10"
-      role="tablist"
-      aria-label="Filter projects by category"
-      data-reveal
-    >
-      <button
-        type="button"
-        class="filter-btn is-active group"
-        data-filter="all"
-        role="tab"
-        aria-selected="true"
-        data-cursor-link
-      >
-        <span class="filter-dot"></span>
-        All
-        <span class="filter-count" data-count-all>{projects.length}</span>
-      </button>
-      {filterableCategories.map((c) => (
-        <button
-          type="button"
-          class="filter-btn"
-          data-filter={c.id}
-          role="tab"
-          aria-selected="false"
-          data-cursor-link
-        >
-          <span class="filter-dot"></span>
-          {c.label}
-          <span class="filter-count" data-count-cat={c.id}>
-            {projects.filter((p) => p.data.category === c.id).length}
-          </span>
-        </button>
+    <div class="work-grid" id="work-grid">
+      {projects.map((p, i) => (
+        <div class="work-cell" style={`--reveal-delay: ${(i % 6) * 70}ms;`} data-reveal data-cat={p.data.category}>
+          <ProjectCard
+            title={p.data.title}
+            category={p.data.category}
+            tagline={p.data.tagline}
+            year={p.data.year}
+            thumbnail={p.data.thumbnail}
+            media={p.data.media}
+            vertical={p.data.vertical}
+            tags={p.data.tags}
+            external={p.data.external}
+          />
+        </div>
       ))}
     </div>
-
-    <div
-      id="project-grid"
-      class="grid grid-cols-2 sm:grid-cols-12 gap-3 sm:gap-6 auto-rows-[180px] sm:auto-rows-[260px]"
-    >
-      {projects.map((project, i) => {
-        const isVertical = project.data.vertical;
-        const isImage = project.data.media.type === 'image';
-        const isFeatured = project.data.featured;
-
-        // Asymmetric grid: cols-2 mobile, cols-12 desktop.
-        let span = 'col-span-2 sm:col-span-6 lg:col-span-4 row-span-2';
-        if (isVertical) {
-          span = 'col-span-1 sm:col-span-4 lg:col-span-3 row-span-2 sm:row-span-3';
-        } else if (isFeatured && i % 5 === 0) {
-          span = 'col-span-2 sm:col-span-8 lg:col-span-7 row-span-2 sm:row-span-3';
-        } else if (isFeatured && i % 5 === 2) {
-          span = 'col-span-2 sm:col-span-6 lg:col-span-5 row-span-2';
-        } else if (isImage) {
-          span = 'col-span-1 sm:col-span-4 lg:col-span-3 row-span-2';
-        }
-
-        return (
-          <ProjectCard
-            project={project}
-            spanClass={span}
-            indexLabel={String(i + 1).padStart(2, '0')}
-          />
-        );
-      })}
-    </div>
-
-    <p
-      id="empty-state"
-      class="hidden mt-12 text-center text-ink-soft font-mono text-sm tracking-wider"
-    >
-      Nothing in this category yet — check back soon.
-    </p>
   </div>
 </section>
 
-<style>
-  .filter-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    padding: 0.55rem 1.1rem;
-    border-radius: 9999px;
-    border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
-    background: var(--color-paper);
-    color: var(--color-ink-soft);
-    font-size: 0.85rem;
-    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-  }
-  .filter-btn:hover {
-    color: var(--color-ink);
-    border-color: color-mix(in srgb, var(--color-ink) 30%, transparent);
-    transform: translateY(-1px);
-  }
-  .filter-btn.is-active {
-    background: var(--color-ink);
-    color: var(--color-cream);
-    border-color: var(--color-ink);
-  }
-  .filter-dot {
-    width: 6px;
-    height: 6px;
-    border-radius: 9999px;
-    background: var(--color-coral);
-    display: inline-block;
-  }
-  .filter-btn.is-active .filter-dot {
-    background: var(--color-cream);
-  }
-  .filter-count {
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    opacity: 0.7;
-  }
-</style>
-
 <script>
-  const buttons = document.querySelectorAll<HTMLButtonElement>('.filter-btn');
-  const grid = document.getElementById('project-grid');
-  const empty = document.getElementById('empty-state');
-
-  if (grid) {
-    const cards = Array.from(grid.querySelectorAll<HTMLElement>('[data-card]'));
-    buttons.forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const filter = btn.dataset.filter ?? 'all';
-        buttons.forEach((b) => {
-          const active = b === btn;
-          b.classList.toggle('is-active', active);
-          b.setAttribute('aria-selected', String(active));
-        });
-        let visible = 0;
-        cards.forEach((card) => {
-          const cat = card.dataset.category;
-          const show = filter === 'all' || cat === filter;
-          card.classList.toggle('hidden', !show);
-          if (show) visible++;
-        });
-        if (empty) empty.classList.toggle('hidden', visible !== 0);
+  (() => {
+    const grid = document.getElementById('work-grid');
+    const count = document.getElementById('work-count');
+    if (!grid) return;
+    const tabs = document.querySelectorAll<HTMLButtonElement>('#work .tab');
+    const cells = grid.querySelectorAll<HTMLElement>('.work-cell');
+    function applyFilter(cat: string) {
+      let shown = 0;
+      cells.forEach((cell) => {
+        const ok = cat === 'all' || cell.dataset.cat === cat;
+        cell.style.display = ok ? '' : 'none';
+        if (ok) shown++;
+      });
+      if (count) count.textContent = `${shown} project${shown === 1 ? '' : 's'}`;
+    }
+    tabs.forEach((tab) => {
+      tab.addEventListener('click', () => {
+        tabs.forEach((t) => t.setAttribute('aria-selected', String(t === tab)));
+        applyFilter(tab.dataset.filter || 'all');
       });
     });
-  }
+  })();
 </script>
+
+<style>
+  .work {
+    padding-block: clamp(5rem, 12vw, 8rem);
+    background: var(--bg);
+  }
+  .work-head { max-width: 60rem; margin-bottom: clamp(2rem, 4vw, 3rem); display: flex; flex-direction: column; gap: 1rem; }
+  .work-title {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.6rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+  .work-lede { color: var(--fg-soft); max-width: 56ch; line-height: 1.6; }
+
+  .work-controls {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .work-count {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--mute);
+  }
+
+  .work-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.4rem;
+  }
+  @media (min-width: 700px) { .work-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1080px) { .work-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+</style>
