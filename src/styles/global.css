@@ -576,7 +576,8 @@
   position: fixed; top: 0; left: 0;
   height: 2px; width: 0%;
   background: var(--accent);
-  z-index: 80;
+  /* Must paint above the sticky header (z-index: 80). */
+  z-index: 90;
   transition: width 0.1s linear;
 }
 

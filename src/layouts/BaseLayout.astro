@@ -305,7 +305,9 @@ const personJsonLd = {
           if (e.target === lightbox) closeLightbox();
         });
         document.addEventListener('keydown', (e) => {
-          if (e.key === 'Escape') closeLightbox();
+          if (e.key === 'Escape' && lightbox?.classList.contains('is-open')) {
+            closeLightbox();
+          }
         });
 
         document.querySelectorAll<HTMLElement>('[data-media]').forEach((el) => {
