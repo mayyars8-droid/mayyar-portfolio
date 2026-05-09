@@ -295,10 +295,27 @@ const personJsonLd = {
         }
         function closeLightbox() {
           if (!lightbox || !lightboxFrame) return;
+          // 1. Stop playback immediately so audio cuts off, but keep the DOM
+          //    around so the 0.4s opacity fade-out has something to fade.
+          const ifr = lightboxFrame.querySelector('iframe');
+          if (ifr) ifr.src = 'about:blank';
+          const vid = lightboxFrame.querySelector('video');
+          if (vid) {
+            try { vid.pause(); } catch { /* ignore */ }
+          }
           lightbox.classList.remove('is-open');
-          lightbox.setAttribute('aria-hidden', 'true');
-          lightboxFrame.innerHTML = '';
           document.body.style.overflow = '';
+          // 2. Once the overlay has fully faded, clear contents and aria-hide.
+          let cleaned = false;
+          const cleanup = () => {
+            if (cleaned) return;
+            cleaned = true;
+            if (!lightbox || !lightboxFrame) return;
+            lightboxFrame.innerHTML = '';
+            lightbox.setAttribute('aria-hidden', 'true');
+          };
+          lightbox.addEventListener('transitionend', cleanup, { once: true });
+          window.setTimeout(cleanup, 500);
         }
         lightboxClose?.addEventListener('click', closeLightbox);
         lightbox?.addEventListener('click', (e) => {
@@ -318,13 +335,18 @@ const personJsonLd = {
             } catch {}
           });
           el.addEventListener('keydown', (e: KeyboardEvent) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              try {
-                const data = JSON.parse(el.dataset.media || '{}');
-                openLightbox(data);
-              } catch {}
+            if (e.key !== 'Enter' && e.key !== ' ') return;
+            // Don't hijack Enter/Space when the keypress originated on a
+            // descendant interactive control (e.g. a project's external link).
+            const target = e.target as HTMLElement;
+            if (target !== el && target.closest('a, button, input, select, textarea, [role="button"]')) {
+              return;
             }
+            e.preventDefault();
+            try {
+              const data = JSON.parse(el.dataset.media || '{}');
+              openLightbox(data);
+            } catch {}
           });
         });
       })();
