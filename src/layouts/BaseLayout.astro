@@ -298,7 +298,9 @@ const personJsonLd = {
           const safeAlt = escAttr(payload.alt || '');
           if (payload.type === 'youtube') {
             const sep = payload.src.includes('?') ? '&amp;' : '?';
-            lightboxFrame.innerHTML = `<iframe src="${safeSrc}${sep}autoplay=1&amp;rel=0" title="Video" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>`;
+            // Match the permissions YouTube embeds need for full playback
+            // (DRM via encrypted-media, sensor-based player UI, etc.).
+            lightboxFrame.innerHTML = `<iframe src="${safeSrc}${sep}autoplay=1&amp;rel=0" title="Video" allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>`;
           } else if (payload.type === 'image') {
             lightboxFrame.innerHTML = `<img src="${safeSrc}" alt="${safeAlt}" />`;
           } else if (payload.type === 'video') {
