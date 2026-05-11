@@ -63,7 +63,55 @@ const experience = defineCollection({
   }),
 });
 
-export const collections = { projects, experience };
+const caseStudyCategories = ['skincare', 'supplement', 'saas', 'general'] as const;
+
+const caseStudies = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/case-studies' }),
+  schema: z.object({
+    title: z.string(),
+    client: z.string(),
+    category: z.enum(caseStudyCategories),
+    summary: z.string(),
+    cover: z.string(),
+    service: z.string(),
+    deliverables: z.array(z.string()),
+    duration: z.string(),
+    spec: z.boolean().default(false),
+    problem: z.string(),
+    approach: z.string(),
+    process: z.array(
+      z.object({
+        step: z.string(),
+        detail: z.string(),
+      }),
+    ),
+    outcome: z.array(
+      z.object({
+        label: z.string(),
+        value: z.string(),
+      }),
+    ),
+    gallery: z.array(
+      z.object({
+        src: z.string(),
+        alt: z.string().optional(),
+        caption: z.string().optional(),
+      }),
+    ).default([]),
+    testimonial: z
+      .object({
+        quote: z.string(),
+        author: z.string(),
+        role: z.string().optional(),
+      })
+      .optional(),
+    order: z.number().int().default(0),
+  }),
+});
+
+export const collections = { projects, experience, caseStudies };
 
 export type ProjectCategory = (typeof projectCategories)[number];
 export const PROJECT_CATEGORIES = projectCategories;
+export type CaseStudyCategory = (typeof caseStudyCategories)[number];
+export const CASE_STUDY_CATEGORIES = caseStudyCategories;

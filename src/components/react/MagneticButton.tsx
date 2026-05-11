@@ -7,6 +7,8 @@ type Props = {
   className?: string;
   strength?: number;
   style?: CSSProperties;
+  target?: '_blank' | '_self';
+  rel?: string;
 };
 
 export default function MagneticButton({
@@ -15,6 +17,8 @@ export default function MagneticButton({
   className = '',
   strength = 0.35,
   style,
+  target,
+  rel,
 }: Props) {
   const ref = useRef<HTMLAnchorElement | HTMLButtonElement | null>(null);
 
@@ -44,6 +48,8 @@ export default function MagneticButton({
       <a
         ref={ref as React.RefObject<HTMLAnchorElement>}
         href={href}
+        target={target}
+        rel={rel}
         className={`inline-block transition-transform duration-300 ease-out ${className}`}
         style={style}
         data-cursor-link

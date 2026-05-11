@@ -1,16 +1,18 @@
 ---
 import { getCollection } from 'astro:content';
-import { CATEGORIES } from '@/lib/site';
+import { CATEGORIES, type ProjectCategory } from '@/lib/site';
 import ProjectCard from './ProjectCard.astro';
 
+// Tightened library: only commercial-ready categories. Hides weaker disciplines per the
+// positioning plan so prospects see ad-ready, brand-led work first.
+const SHOWN_CATEGORIES: ProjectCategory[] = ['ai', 'design', 'motion', 'editing', 'content'];
+
 const all = await getCollection('projects');
-// Filter out AI projects from the main grid (they get their own dedicated section)
-// and split design from video-led work for richer layouts.
 const projects = all
-  .filter((p) => p.data.category !== 'ai')
+  .filter((p) => SHOWN_CATEGORIES.includes(p.data.category))
   .sort((a, b) => (b.data.order ?? 0) - (a.data.order ?? 0));
 
-const filterableCategories = CATEGORIES.filter((c) => c.id !== 'ai');
+const filterableCategories = CATEGORIES.filter((c) => SHOWN_CATEGORIES.includes(c.id));
 ---
 
 <section id="work" class="relative py-24 sm:py-36 overflow-hidden">
@@ -18,21 +20,20 @@ const filterableCategories = CATEGORIES.filter((c) => c.id !== 'ai');
     <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-12">
       <div>
         <p class="font-mono text-xs tracking-[0.3em] text-ink-soft" data-reveal>
-          // 02 · SELECTED WORK
+          // 04 · SELECTED WORK
         </p>
         <h2
           class="mt-5 font-display leading-[0.95] tracking-tight text-balance"
           style="font-size: clamp(2.4rem, 7vw, 6.5rem);"
           data-reveal
         >
-          A reel of <em class="not-italic text-coral">moving pictures</em>,
-          <br />and the design that makes them sing.
+          The library — <em class="not-italic text-coral">ad-ready</em>,
+          <br />brand-led, generation-fast.
         </h2>
       </div>
       <p class="max-w-md text-ink-soft text-pretty" data-reveal>
-        Filter by discipline. Each project opens in a fullscreen viewer.
-        The full library lives in a content folder — adding new work is a
-        one-file commit.
+        Filter by discipline. Heaviest on AI ads, product visuals and short-form social — the work that
+        actually moves business metrics. Each piece opens in a fullscreen viewer.
       </p>
     </div>
 
