@@ -1,0 +1,125 @@
+---
+import { SITE } from '@/lib/site';
+---
+
+<section
+  id="free-mock"
+  class="relative py-24 sm:py-36 overflow-hidden grain"
+>
+  <div class="absolute inset-0 bg-gradient-to-b from-paper via-cream to-cream-2"></div>
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute -top-[10vmin] left-1/4 h-[55vmin] w-[55vmin] rounded-full bg-coral/25 blur-[140px]"
+  ></div>
+  <div
+    aria-hidden="true"
+    class="pointer-events-none absolute -bottom-[10vmin] right-0 h-[45vmin] w-[45vmin] rounded-full bg-blue/15 blur-[140px]"
+  ></div>
+
+  <div class="relative max-w-5xl mx-auto px-6 sm:px-10">
+    <div
+      class="rounded-[2rem] sm:rounded-[2.5rem] border border-ink/10 bg-paper/85 backdrop-blur-md p-8 sm:p-12 lg:p-16 shadow-[0_30px_120px_-60px_rgba(20,20,15,0.35)]"
+      data-reveal
+    >
+      <div class="flex flex-col md:flex-row md:items-start gap-10">
+        <div class="md:max-w-md">
+          <span class="inline-flex items-center gap-2 rounded-full bg-coral/10 border border-coral/30 text-coral text-[11px] tracking-[0.22em] uppercase font-mono px-3 py-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-coral animate-pulse"></span>
+            Free · Limited slots
+          </span>
+          <h2
+            class="mt-5 font-display leading-[1.02] tracking-tight text-balance"
+            style="font-size: clamp(2rem, 5vw, 3.6rem);"
+          >
+            Send me your product —
+            <span class="text-coral">I’ll send you back a free AI mock.</span>
+          </h2>
+          <p class="mt-5 text-ink-soft text-base sm:text-lg text-pretty">
+            Drop your product photo or website. Within 48 hours, I’ll reply with one polished, on-brand
+            AI-generated visual you can actually use. No sales call required — if you like it,
+            we’ll talk about a full pack.
+          </p>
+
+          <ul class="mt-7 space-y-2.5 text-sm text-ink">
+            <li class="flex items-start gap-3">
+              <span aria-hidden="true" class="mt-2 w-1.5 h-1.5 rounded-full bg-coral shrink-0"></span>
+              <span>1 free hero image, exported at 1080×1350</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span aria-hidden="true" class="mt-2 w-1.5 h-1.5 rounded-full bg-coral shrink-0"></span>
+              <span>Delivered within 48 hours</span>
+            </li>
+            <li class="flex items-start gap-3">
+              <span aria-hidden="true" class="mt-2 w-1.5 h-1.5 rounded-full bg-coral shrink-0"></span>
+              <span>No deck, no sales pitch — just the work</span>
+            </li>
+          </ul>
+        </div>
+
+        <form
+          name={SITE.leadFormName}
+          method="POST"
+          data-netlify="true"
+          netlify-honeypot="bot-field"
+          action="/thanks"
+          class="flex-1 grid grid-cols-1 gap-4"
+        >
+          <input type="hidden" name="form-name" value={SITE.leadFormName} />
+          <p class="hidden">
+            <label>Don’t fill this out: <input name="bot-field" /></label>
+          </p>
+
+          <label class="block">
+            <span class="font-mono text-[10px] tracking-[0.22em] uppercase text-ink-soft">Your name</span>
+            <input
+              type="text"
+              name="name"
+              required
+              autocomplete="name"
+              class="mt-2 w-full rounded-2xl border border-ink/15 bg-paper px-4 py-3 text-ink placeholder:text-ink-soft/60 focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/25"
+              placeholder="Sara from Glow Co."
+            />
+          </label>
+
+          <label class="block">
+            <span class="font-mono text-[10px] tracking-[0.22em] uppercase text-ink-soft">Work email</span>
+            <input
+              type="email"
+              name="email"
+              required
+              autocomplete="email"
+              class="mt-2 w-full rounded-2xl border border-ink/15 bg-paper px-4 py-3 text-ink placeholder:text-ink-soft/60 focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/25"
+              placeholder="sara@glow.co"
+            />
+          </label>
+
+          <label class="block">
+            <span class="font-mono text-[10px] tracking-[0.22em] uppercase text-ink-soft">Product link or short description</span>
+            <textarea
+              name="product"
+              required
+              rows="3"
+              class="mt-2 w-full rounded-2xl border border-ink/15 bg-paper px-4 py-3 text-ink placeholder:text-ink-soft/60 focus:border-coral focus:outline-none focus:ring-2 focus:ring-coral/25 resize-none"
+              placeholder="Drop your website, Shopify or product page — or describe your product in one line."
+            ></textarea>
+          </label>
+
+          <button
+            type="submit"
+            class="group inline-flex items-center justify-center gap-3 rounded-full bg-ink text-cream px-6 py-4 text-base font-medium hover:bg-coral transition-colors"
+          >
+            Send me a free mock
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="M13 5l7 7-7 7" />
+            </svg>
+          </button>
+
+          <p class="text-xs text-ink-soft text-pretty">
+            By submitting you agree to receive one reply with your mock. No newsletter. Unsubscribe by ignoring me.
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>

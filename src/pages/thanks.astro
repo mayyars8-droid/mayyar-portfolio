@@ -1,0 +1,57 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { SITE } from '@/lib/site';
+---
+
+<BaseLayout
+  title="Thanks — your free mock is queued"
+  description="Thanks for submitting. I'll get back to you within 48 hours with a free AI mock built from your product."
+>
+  <section class="relative min-h-[100svh] flex items-center overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-cream via-paper to-cream-2"></div>
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute -top-[10vmin] left-1/3 h-[55vmin] w-[55vmin] rounded-full bg-coral/25 blur-[140px]"
+    ></div>
+
+    <div class="relative max-w-3xl mx-auto px-6 sm:px-10 py-32 sm:py-44 text-center">
+      <span class="inline-flex items-center gap-2 rounded-full bg-coral/10 border border-coral/30 text-coral text-[11px] tracking-[0.22em] uppercase font-mono px-3 py-1.5">
+        <span class="w-1.5 h-1.5 rounded-full bg-coral"></span>
+        Got it · Queued
+      </span>
+
+      <h1
+        class="mt-7 font-display leading-[0.95] tracking-tight text-balance"
+        style="font-size: clamp(2.2rem, 7vw, 5.2rem);"
+      >
+        Thanks. I’ll reply within
+        <em class="not-italic text-coral">48 hours</em>
+        with your mock.
+      </h1>
+
+      <p class="mt-7 max-w-xl mx-auto text-ink-soft text-base sm:text-lg text-pretty">
+        Check your inbox (and spam) — I’ll send back one polished, on-brand AI-generated visual you can
+        actually use. If it looks like a fit, we’ll talk about a full pack on a 20-minute call.
+      </p>
+
+      <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+        <a
+          href={SITE.calendly}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-cursor-link
+          class="inline-flex items-center gap-2 rounded-full bg-ink text-cream px-6 py-3.5 text-sm font-medium hover:bg-coral transition-colors"
+        >
+          Skip the wait — book a call now
+        </a>
+        <a
+          href="/"
+          data-cursor-link
+          class="inline-flex items-center gap-2 rounded-full border border-ink/20 bg-paper px-6 py-3.5 text-sm font-medium text-ink hover:bg-ink hover:text-cream transition-colors"
+        >
+          Back to home
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

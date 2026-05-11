@@ -1,0 +1,79 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Services from '@/components/Services.astro';
+import Testimonials from '@/components/Testimonials.astro';
+import LeadMagnet from '@/components/LeadMagnet.astro';
+import { SITE } from '@/lib/site';
+---
+
+<BaseLayout
+  title="Services & Pricing"
+  description="Three productized offers for DTC brands and tech startups: AI Product Pack ($400), AI Ad Sprint ($700), Social Content Retainer ($500/mo). Fixed scope, fixed price, 3–5 day delivery."
+>
+  <section class="relative pt-32 sm:pt-44 pb-12 overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-cream via-paper to-cream-2"></div>
+    <div
+      aria-hidden="true"
+      class="pointer-events-none absolute -top-[10vmin] -right-[10vmin] h-[60vmin] w-[60vmin] rounded-full bg-coral/25 blur-[140px]"
+    ></div>
+
+    <div class="relative max-w-7xl mx-auto px-6 sm:px-10">
+      <a
+        href="/"
+        data-cursor-link
+        class="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-ink"
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M19 12H5" />
+          <path d="M12 19l-7-7 7-7" />
+        </svg>
+        Back to home
+      </a>
+
+      <p class="mt-10 font-mono text-xs tracking-[0.3em] text-ink-soft">
+        // SERVICES &amp; PRICING
+      </p>
+
+      <h1
+        class="mt-5 font-display leading-[0.95] tracking-tight text-balance"
+        style="font-size: clamp(2.4rem, 7.5vw, 7rem);"
+      >
+        Pricing on the page. <br />
+        <em class="not-italic text-coral">No quote forms.</em>
+      </h1>
+
+      <p class="mt-6 max-w-2xl text-ink-soft text-base sm:text-lg text-pretty">
+        Three productized offers built for DTC brands and tech startups. Pick the one that matches what
+        you’re shipping. If you need something bigger, book a call and we’ll scope a custom engagement —
+        but the starting prices are right here, in the open.
+      </p>
+
+      <div class="mt-10 flex flex-wrap gap-3">
+        <a
+          href={SITE.calendly}
+          target="_blank"
+          rel="noopener noreferrer"
+          data-cursor-link
+          class="inline-flex items-center gap-2 rounded-full bg-ink text-cream px-6 py-3.5 text-sm font-medium hover:bg-coral transition-colors"
+        >
+          Book a 20-min intro call
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14" />
+            <path d="M13 5l7 7-7 7" />
+          </svg>
+        </a>
+        <a
+          href="#free-mock"
+          data-cursor-link
+          class="inline-flex items-center gap-2 rounded-full border border-ink/20 bg-paper px-6 py-3.5 text-sm font-medium text-ink hover:bg-ink hover:text-cream transition-colors"
+        >
+          Or get a free mock first
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <Services />
+  <Testimonials variant="dark" />
+  <LeadMagnet />
+</BaseLayout>

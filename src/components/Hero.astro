@@ -1,7 +1,7 @@
 ---
 import HeroScene from './react/HeroScene';
 import MagneticButton from './react/MagneticButton';
-import { ROLES } from '@/lib/site';
+import { ROLES, CREDIBILITY, SITE } from '@/lib/site';
 ---
 
 <section
@@ -25,22 +25,19 @@ import { ROLES } from '@/lib/site';
 
   <div class="relative z-[2] max-w-7xl mx-auto px-5 sm:px-10 pt-32 sm:pt-44 pb-24 sm:pb-20">
     <p class="font-mono text-xs tracking-[0.3em] text-ink-soft" data-reveal>
-      // PORTFOLIO · 2025
+      // FOR DTC BRANDS &amp; TECH STARTUPS · 2026
     </p>
 
     <h1
       class="mt-6 font-display font-medium leading-[0.92] tracking-tight text-balance"
-      style="font-size: clamp(2.6rem, 11vw, 11rem);"
+      style="font-size: clamp(2.4rem, 9.5vw, 9rem);"
       data-reveal
     >
-      <span class="block">Storytelling</span>
-      <span class="block flex flex-wrap items-baseline gap-x-3 sm:gap-x-6 gap-y-1 sm:gap-y-2">
-        <span class="text-ink-soft/80 italic">through</span>
+      <span class="block">Product visuals &amp;</span>
+      <span class="block flex flex-wrap items-baseline gap-x-3 sm:gap-x-5 gap-y-1 sm:gap-y-2">
+        <span>video ads, built</span>
         <span class="relative inline-block">
-          <span
-            id="dynamic-word"
-            class="inline-block text-coral"
-          >Pixels</span>
+          <span class="inline-block text-coral">with AI.</span>
           <span
             aria-hidden="true"
             class="absolute -bottom-1 sm:-bottom-2 left-0 right-0 h-2 sm:h-3 bg-blue/15 -z-10"
@@ -51,7 +48,8 @@ import { ROLES } from '@/lib/site';
 
     <div class="mt-8 sm:mt-12 max-w-3xl flex flex-col gap-6 sm:gap-7" data-reveal>
       <p class="text-base sm:text-lg text-ink-soft text-pretty">
-        I’m <strong class="font-semibold text-ink">Mayyar Al-Sharqawi</strong> — a filmmaker, full-stack visual designer and AI specialist based in Jordan. I direct, design and engineer creative work that travels between cinema, brand and emerging tech.
+        I’m <strong class="font-semibold text-ink">Mayyar Al-Sharqawi</strong> — I help DTC brands and SaaS startups
+        ship product images and short-form video ads that look like a studio campaign, in 3 to 5 days, without the studio price tag.
       </p>
 
       <div class="flex flex-wrap gap-2">
@@ -65,14 +63,16 @@ import { ROLES } from '@/lib/site';
       </div>
     </div>
 
-    <div class="mt-8 sm:mt-12 flex flex-wrap items-center gap-5" data-reveal>
+    <div class="mt-8 sm:mt-12 flex flex-wrap items-center gap-4 sm:gap-5" data-reveal>
       <MagneticButton
         client:visible
-        href="#work"
+        href={SITE.calendly}
+        target="_blank"
+        rel="noopener noreferrer"
         className="group rounded-full bg-ink text-cream px-7 py-4 text-base font-medium hover:bg-coral transition-colors"
       >
         <span class="inline-flex items-center gap-3">
-          View the work
+          Book a 20-min intro call
           <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-cream text-ink group-hover:rotate-45 transition-transform">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M5 12h14" />
@@ -83,16 +83,25 @@ import { ROLES } from '@/lib/site';
       </MagneticButton>
 
       <a
-        href="#about"
+        href="/#services"
         data-cursor-link
-        class="inline-flex items-center gap-2 text-sm text-ink-soft hover:text-ink"
+        class="inline-flex items-center gap-2 rounded-full border border-ink/20 bg-paper/70 px-6 py-4 text-sm font-medium text-ink hover:bg-ink hover:text-cream transition-colors"
       >
-        About me
+        See services &amp; pricing
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M12 5v14" />
           <path d="M5 12l7 7 7-7" />
         </svg>
       </a>
+    </div>
+
+    <div class="mt-10 sm:mt-14 grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-5 max-w-3xl" data-reveal>
+      {CREDIBILITY.map((c) => (
+        <div class="flex flex-col">
+          <span class="font-display text-2xl sm:text-3xl leading-none text-ink">{c.value}</span>
+          <span class="mt-2 font-mono text-[10px] tracking-[0.2em] uppercase text-ink-soft">{c.label}</span>
+        </div>
+      ))}
     </div>
   </div>
 
@@ -101,22 +110,3 @@ import { ROLES } from '@/lib/site';
     <span class="block h-10 w-px bg-ink/30"></span>
   </div>
 </section>
-
-<script>
-  const words = ['Pixels', 'Cinema', 'Pictures', 'Story', 'Motion', 'Design', 'Code', 'AI'];
-  const el = document.getElementById('dynamic-word');
-  if (el) {
-    let i = 0;
-    setInterval(() => {
-      i = (i + 1) % words.length;
-      el.style.transition = 'opacity 220ms ease, transform 220ms ease';
-      el.style.opacity = '0';
-      el.style.transform = 'translateY(8px)';
-      setTimeout(() => {
-        el.textContent = words[i] ?? 'Pixels';
-        el.style.opacity = '1';
-        el.style.transform = 'translateY(0)';
-      }, 220);
-    }, 2400);
-  }
-</script>

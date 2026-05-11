@@ -1,0 +1,99 @@
+---
+import { getCollection } from 'astro:content';
+
+const studies = (await getCollection('caseStudies'))
+  .sort((a, b) => (b.data.order ?? 0) - (a.data.order ?? 0));
+---
+
+<section
+  id="case-studies"
+  class="relative py-24 sm:py-36 overflow-hidden"
+>
+  <div class="max-w-7xl mx-auto px-6 sm:px-10">
+    <div class="flex flex-col md:flex-row md:items-end md:justify-between gap-8 mb-12">
+      <div>
+        <p class="font-mono text-xs tracking-[0.3em] text-ink-soft" data-reveal>
+          // 03 · CASE STUDIES
+        </p>
+        <h2
+          class="mt-5 font-display leading-[0.95] tracking-tight text-balance"
+          style="font-size: clamp(2.4rem, 7vw, 6rem);"
+          data-reveal
+        >
+          Problem &rarr; visual &rarr; <em class="not-italic text-coral">outcome.</em>
+        </h2>
+      </div>
+      <p class="max-w-md text-ink-soft text-pretty" data-reveal>
+        Four engagements — three spec rebuilds that demonstrate each productized offer, and one real, ongoing retainer.
+        Every case study shows the problem, the workflow and the numbers.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+      {studies.map((s, i) => (
+        <a
+          href={`/case-studies/${s.id}`}
+          data-cursor-link
+          data-reveal
+          style={`--reveal-delay:${i * 70}ms`}
+          class="group relative flex flex-col overflow-hidden rounded-3xl border border-ink/10 bg-paper hover:border-ink/30 transition-colors"
+        >
+          <div class="relative aspect-[16/10] overflow-hidden bg-cream-2">
+            <img
+              src={s.data.cover}
+              alt={s.data.title}
+              class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-ink/45 via-transparent to-transparent"></div>
+            <div class="absolute top-3 left-3 flex items-center gap-2">
+              <span class="inline-flex items-center gap-1.5 rounded-full bg-paper/95 text-ink font-mono text-[10px] tracking-[0.2em] uppercase px-2.5 py-1">
+                <span class="w-1.5 h-1.5 rounded-full bg-coral"></span>
+                {s.data.service}
+              </span>
+              {s.data.spec && (
+                <span class="rounded-full bg-ink/85 text-cream font-mono text-[10px] tracking-[0.2em] uppercase px-2.5 py-1">
+                  Spec
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div class="flex-1 p-7 sm:p-8 flex flex-col">
+            <p class="font-mono text-[11px] tracking-[0.22em] uppercase text-ink-soft">
+              {s.data.client} · {s.data.duration}
+            </p>
+            <h3 class="mt-3 font-display text-xl sm:text-2xl leading-tight text-ink">
+              {s.data.title}
+            </h3>
+            <p class="mt-3 text-sm sm:text-base text-ink-soft text-pretty">
+              {s.data.summary}
+            </p>
+
+            <div class="mt-6 grid grid-cols-2 gap-4">
+              {s.data.outcome.slice(0, 2).map((o) => (
+                <div>
+                  <p class="font-mono text-[10px] tracking-[0.18em] uppercase text-ink-soft">
+                    {o.label}
+                  </p>
+                  <p class="mt-1 font-display text-lg leading-tight text-ink">
+                    {o.value}
+                  </p>
+                </div>
+              ))}
+            </div>
+
+            <div class="mt-7 flex items-center gap-2 text-sm font-medium text-ink">
+              Read the case study
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" class="group-hover:translate-x-1 transition-transform" aria-hidden="true">
+                <path d="M5 12h14" />
+                <path d="M13 5l7 7-7 7" />
+              </svg>
+            </div>
+          </div>
+        </a>
+      ))}
+    </div>
+  </div>
+</section>

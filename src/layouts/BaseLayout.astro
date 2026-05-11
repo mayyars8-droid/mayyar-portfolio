@@ -8,9 +8,18 @@ import Cursor from '@/components/react/Cursor';
 interface Props {
   title?: string;
   description?: string;
+  ogImage?: string;
 }
-const { title, description = SITE.description } = Astro.props;
-const fullTitle = title ? `${title} — ${SITE.title}` : `${SITE.title} · ${SITE.tagline}`;
+const {
+  title,
+  description = SITE.description,
+  ogImage = '/og-default.jpg',
+} = Astro.props;
+const fullTitle = title
+  ? `${title} — ${SITE.title}`
+  : `${SITE.title} · ${SITE.role}`;
+const canonical = new URL(Astro.url.pathname, SITE.url).toString();
+const ogImageUrl = new URL(ogImage, SITE.url).toString();
 ---
 
 <!doctype html>
@@ -19,12 +28,24 @@ const fullTitle = title ? `${title} — ${SITE.title}` : `${SITE.title} · ${SIT
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="canonical" href={canonical} />
     <meta name="generator" content={Astro.generator} />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
+    <meta name="author" content={SITE.author} />
+
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImageUrl} />
+    <meta property="og:site_name" content={SITE.title} />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageUrl} />
+
     <meta name="theme-color" content="#FAF7F2" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
